@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EducaCode - Quiz de Programação</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <span class="logo">&lt;/&gt; EducaCode</span>
+      </div>
+    </header>
+
+    <main class="home">
+      <h1>Escolha um módulo para testar seus conhecimentos</h1>
+      <p class="subtitle">Cada quiz vale 2 pontos por pergunta. Responda e veja o resultado na hora.</p>
+
+      <div class="modules">
+        <div class="module-card html">
+          <div class="module-icon">🌐</div>
+          <h2>HTML</h2>
+          <p>Estrutura, tags e semântica</p>
+          <span class="module-count" data-modulo="html"></span>
+          <div class="level-links" data-modulo-links="html"></div>
+        </div>
+
+        <div class="module-card css">
+          <div class="module-icon">🎨</div>
+          <h2>CSS</h2>
+          <p>Estilo, seletores e layout</p>
+          <span class="module-count" data-modulo="css"></span>
+          <div class="level-links" data-modulo-links="css"></div>
+        </div>
+
+        <div class="module-card js">
+          <div class="module-icon">⚡</div>
+          <h2>JavaScript</h2>
+          <p>Lógica, DOM e eventos</p>
+          <span class="module-count" data-modulo="js"></span>
+          <div class="level-links" data-modulo-links="js"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Este conteúdo não foi criado nem aprovado por terceiros. Feito para fins educativos.</p>
+      <div class="author">
+        <img class="author-photo" src="https://github.com/lucasinmanuel.png" alt="Foto de Lucas Emanuel Santana dos Santos">
+        <div class="author-info">
+          <span class="author-name">Lucas Emanuel Santana dos Santos</span>
+          <div class="author-links">
+            <a href="https://www.linkedin.com/in/lucasinmanuel/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <span class="author-sep">&middot;</span>
+            <a href="https://github.com/lucasinmanuel" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/questions-html.js"></script>
+  <script src="js/questions-css.js"></script>
+  <script src="js/questions-js.js"></script>
+  <script>
+    const LEVELS = [
+      { key: 'iniciante', label: 'Iniciante' },
+      { key: 'intermediario', label: 'Intermediário' },
+      { key: 'avancado', label: 'Avançado' }
+    ];
+    const BANKS = { html: window.QUESTIONS_HTML, css: window.QUESTIONS_CSS, js: window.QUESTIONS_JS };
+
+    document.querySelectorAll('.module-count').forEach(el => {
+      const bank = BANKS[el.dataset.modulo] || [];
+      el.textContent = bank.length + ' perguntas';
+    });
+
+    document.querySelectorAll('.level-links').forEach(el => {
+      const mod = el.dataset.moduloLinks;
+      const bank = BANKS[mod] || [];
+      LEVELS.forEach(level => {
+        const count = bank.filter(q => (q.level || 'iniciante') === level.key).length;
+        const link = document.createElement('a');
+        link.className = 'level-link' + (count === 0 ? ' disabled' : '');
+        link.href = `quiz.html?modulo=${mod}&nivel=${level.key}`;
+        link.textContent = `${level.label} (${count})`;
+        el.appendChild(link);
+      });
+    });
+  </script>
+</body>
+</html>
