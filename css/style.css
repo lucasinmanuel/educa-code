@@ -416,6 +416,18 @@ input:disabled ~ .option-text,
   padding: 20px;
 }
 
+.license-note {
+  font-size: 0.75rem;
+  margin: 4px 0 0;
+}
+
+.license-note a {
+  color: var(--purple-dark);
+  text-decoration: none;
+}
+
+.license-note a:hover { text-decoration: underline; }
+
 .author {
   display: flex;
   align-items: center;
