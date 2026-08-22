@@ -91,8 +91,8 @@ window.TERMS = [
   <text x="209" y="140" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">responde</text>
 
   <rect x="242" y="50" width="116" height="94" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.6"/>
-  <text x="300" y="92" font-size="19" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">API</text>
-  <text x="300" y="114" font-size="13" text-anchor="middle" fill="var(--purple-dark)">a ponte</text>
+  <text x="300" y="91" font-size="19" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">API</text>
+  <text x="300" y="113" font-size="13" text-anchor="middle" fill="var(--purple-dark)">a ponte</text>
 
   <line x1="364" y1="76" x2="414" y2="76" stroke="var(--purple)" stroke-width="2.4" marker-end="url(#api-a)"/>
   <line x1="414" y1="118" x2="364" y2="118" stroke="var(--purple)" stroke-width="2.4" marker-end="url(#api-a)"/>
@@ -121,12 +121,12 @@ window.TERMS = [
     </marker>
   </defs>
   <rect x="34" y="12" width="164" height="58" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <text x="116" y="40" font-size="17" text-anchor="middle" font-weight="650">Cliente</text>
-  <text x="116" y="60" font-size="13" text-anchor="middle" class="s2">navegador</text>
+  <text x="116" y="36" font-size="17" text-anchor="middle" font-weight="650">Cliente</text>
+  <text x="116" y="56" font-size="13" text-anchor="middle" class="s2">navegador</text>
 
   <rect x="402" y="12" width="164" height="58" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.4"/>
-  <text x="484" y="40" font-size="17" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Servidor</text>
-  <text x="484" y="60" font-size="13" text-anchor="middle" fill="var(--purple-dark)">onde o site mora</text>
+  <text x="484" y="36" font-size="17" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Servidor</text>
+  <text x="484" y="56" font-size="13" text-anchor="middle" fill="var(--purple-dark)">onde o site mora</text>
 
   <line x1="116" y1="70" x2="116" y2="216" stroke="currentColor" stroke-width="1.5" stroke-dasharray="6 5" opacity=".45"/>
   <line x1="484" y1="70" x2="484" y2="216" stroke="var(--purple)" stroke-width="1.5" stroke-dasharray="6 5" opacity=".5"/>
@@ -156,7 +156,7 @@ window.TERMS = [
     </marker>
   </defs>
   <rect x="216" y="14" width="168" height="60" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <text x="300" y="52" font-size="17" text-anchor="middle" font-weight="650">Backend</text>
+  <text x="300" y="49" font-size="17" text-anchor="middle" font-weight="650">Backend</text>
 
   <line x1="300" y1="74" x2="300" y2="96" stroke="currentColor" stroke-width="2"/>
   <line x1="96" y1="96" x2="504" y2="96" stroke="currentColor" stroke-width="2"/>
@@ -165,16 +165,16 @@ window.TERMS = [
   <line x1="504" y1="96" x2="504" y2="128" stroke="currentColor" stroke-width="2" marker-end="url(#db-n)"/>
 
   <rect x="20" y="134" width="152" height="66" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.2"/>
-  <text x="96" y="164" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Usuários</text>
-  <text x="96" y="186" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">nome · e-mail</text>
+  <text x="96" y="161" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Usuários</text>
+  <text x="96" y="183" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">nome · e-mail</text>
 
   <rect x="224" y="134" width="152" height="66" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.2"/>
-  <text x="300" y="164" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Pedidos</text>
-  <text x="300" y="186" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">data · valor</text>
+  <text x="300" y="161" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Pedidos</text>
+  <text x="300" y="183" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">data · valor</text>
 
   <rect x="428" y="134" width="152" height="66" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.2"/>
-  <text x="504" y="164" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Produtos</text>
-  <text x="504" y="186" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">preço · estoque</text>
+  <text x="504" y="161" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Produtos</text>
+  <text x="504" y="183" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">preço · estoque</text>
 
   <text x="300" y="120" font-size="13" text-anchor="middle" class="s2">tabelas</text>
 </svg>`
@@ -323,6 +323,7 @@ window.TERMS = [
 
   <rect x="446" y="76" width="140" height="76" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.6"/>
   <text x="516" y="110" font-size="16.5" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Servidor</text>
+  <text x="516" y="132" font-size="13" text-anchor="middle" fill="var(--purple-dark)">onde o site mora</text>
 
   <text x="300" y="46" font-size="13.5" text-anchor="middle" class="s2">o que eu quero fazer</text>
   <text x="300" y="70" font-size="15" text-anchor="middle" font-weight="650">GET · POST · PUT · DELETE</text>

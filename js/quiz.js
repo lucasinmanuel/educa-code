@@ -298,6 +298,9 @@
 
       listEl.appendChild(card);
     });
+
+    // Reaplica os tooltips de sigla no conteúdo recém-criado.
+    if (window.applyAcronyms) window.applyAcronyms(listEl);
   }
 
   function resetQuiz() {

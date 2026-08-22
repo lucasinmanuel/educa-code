@@ -242,4 +242,9 @@
     card.appendChild(figure);
     grid.appendChild(card);
   });
+
+  if (window.applyAcronyms) {
+    window.applyAcronyms(summaryList);
+    window.applyAcronyms(grid);
+  }
 })();

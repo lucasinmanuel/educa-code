@@ -811,6 +811,89 @@ input:disabled ~ .option-text,
 }
 .btn-secondary:hover { background: #f3edfb; }
 
+/* Siglas com tooltip */
+.acronym {
+  text-decoration: none;
+  border-bottom: 1px dotted var(--purple);
+  cursor: help;
+  padding-bottom: 1px;
+}
+
+.acronym:hover,
+.acronym:focus-visible {
+  background: var(--purple-soft);
+  border-radius: 3px;
+  outline: none;
+}
+
+.acronym:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
+.acronym-tip {
+  position: fixed;
+  z-index: 200;
+  max-width: 290px;
+  background: #23252b;
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  pointer-events: none;
+  text-align: left;
+}
+
+.acronym-tip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.acronym-tip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: #23252b;
+  bottom: -12px;
+}
+
+.acronym-tip.below::after {
+  bottom: auto;
+  top: -12px;
+  border-top-color: transparent;
+  border-bottom-color: #23252b;
+}
+
+.tip-sigla {
+  display: block;
+  font-weight: 700;
+  color: #c4a7f7;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.tip-full {
+  display: block;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.tip-pt {
+  display: block;
+  margin-top: 6px;
+  color: #b9bec9;
+  font-size: 0.78rem;
+}
+
 .footer {
   text-align: center;
   color: var(--gray-text);
