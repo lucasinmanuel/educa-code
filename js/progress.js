@@ -1,7 +1,8 @@
 // Progresso do aluno, salvo no navegador (localStorage).
-// Guarda apenas a melhor nota e a data de cada módulo/nível.
+// Guarda a melhor nota por módulo/nível/fase.
 (function () {
-  const CHAVE = "educacode:progresso:v1";
+  // v2: a chave passou a incluir a fase. Dados da v1 são ignorados.
+  const CHAVE = "educacode:progresso:v2";
 
   // localStorage pode lançar exceção (aba anônima, cookies bloqueados).
   // Nesses casos o app segue funcionando, só não guarda nada.
@@ -23,15 +24,19 @@
     }
   }
 
-  function chaveDe(modulo, nivel) {
-    return modulo + ":" + nivel;
+  function chaveDe(modulo, nivel, fase) {
+    return modulo + ":" + nivel + ":" + (fase || 1);
+  }
+
+  function concluido(registro) {
+    return !!registro && registro.total > 0 && registro.melhor === registro.total;
   }
 
   window.Progresso = {
-    /** Registra uma tentativa. Só sobrescreve se a nota for melhor. */
-    salvar: function (modulo, nivel, pontos, total) {
+    /** Registra uma tentativa. Só sobrescreve a nota se ela for melhor. */
+    salvar: function (modulo, nivel, fase, pontos, total) {
       const dados = ler();
-      const k = chaveDe(modulo, nivel);
+      const k = chaveDe(modulo, nivel, fase);
       const anterior = dados[k];
 
       const registro = {
@@ -46,25 +51,66 @@
       return registro;
     },
 
-    /** Retorna o registro de um nível, ou null se nunca foi feito. */
-    obter: function (modulo, nivel) {
-      return ler()[chaveDe(modulo, nivel)] || null;
+    /** Registro de uma fase, ou null se nunca foi jogada. */
+    obter: function (modulo, nivel, fase) {
+      return ler()[chaveDe(modulo, nivel, fase)] || null;
     },
 
-    /** Resumo de um módulo: quantos níveis foram concluídos (100%). */
-    resumoModulo: function (modulo, niveis) {
-      const dados = ler();
-      let concluidos = 0;
-      let iniciados = 0;
+    /** true se a fase foi feita com nota máxima. */
+    concluida: function (modulo, nivel, fase) {
+      return concluido(this.obter(modulo, nivel, fase));
+    },
 
-      niveis.forEach(function (nivel) {
-        const r = dados[chaveDe(modulo, nivel)];
-        if (!r) return;
-        iniciados++;
-        if (r.total > 0 && r.melhor === r.total) concluidos++;
+    /**
+     * A fase 1 está sempre aberta; as demais só liberam quando a anterior
+     * foi concluída com nota máxima.
+     */
+    liberada: function (modulo, nivel, fase) {
+      if (fase <= 1) return true;
+      return this.concluida(modulo, nivel, fase - 1);
+    },
+
+    /** Número da fase mais avançada que o aluno pode jogar agora. */
+    ultimaLiberada: function (modulo, nivel, totalFases) {
+      let f = 1;
+      while (f < totalFases && this.concluida(modulo, nivel, f)) f++;
+      return f;
+    },
+
+    /** Quantas fases de um nível foram concluídas e iniciadas. */
+    resumoNivel: function (modulo, nivel, totalFases) {
+      const dados = ler();
+      let concluidas = 0;
+      let iniciadas = 0;
+
+      for (let f = 1; f <= totalFases; f++) {
+        const r = dados[chaveDe(modulo, nivel, f)];
+        if (!r) continue;
+        iniciadas++;
+        if (concluido(r)) concluidas++;
+      }
+
+      return { concluidas: concluidas, iniciadas: iniciadas, total: totalFases };
+    },
+
+    /**
+     * Resumo do módulo inteiro.
+     * `fasesPorNivel` é um objeto tipo { iniciante: 2, intermediario: 2, avancado: 2 }.
+     */
+    resumoModulo: function (modulo, fasesPorNivel) {
+      const self = this;
+      let concluidas = 0;
+      let iniciadas = 0;
+      let total = 0;
+
+      Object.keys(fasesPorNivel).forEach(function (nivel) {
+        const r = self.resumoNivel(modulo, nivel, fasesPorNivel[nivel]);
+        concluidas += r.concluidas;
+        iniciadas += r.iniciadas;
+        total += r.total;
       });
 
-      return { concluidos: concluidos, iniciados: iniciados, total: niveis.length };
+      return { concluidas: concluidas, iniciadas: iniciadas, total: total };
     },
 
     /** Apaga todo o progresso salvo. */
@@ -77,7 +123,7 @@
       }
     },
 
-    /** true se o navegador aceita gravar (usado para esconder a UI se não). */
+    /** true se o navegador aceita gravar. */
     disponivel: function () {
       try {
         const teste = "__educacode_teste__";

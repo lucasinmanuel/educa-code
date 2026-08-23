@@ -130,6 +130,55 @@ window.QUESTIONS_HTML = [
     correct: 1
   },
 
+  {
+    level: "intermediario",
+    question: 'Para que serve a tag <meta name="viewport" content="width=device-width, initial-scale=1"> no <head>?',
+    explicacao: "Ela avisa o navegador do celular para usar a largura real da tela em vez de fingir uma tela de desktop. Sem ela, o site responsivo aparece \"encolhido\" no celular.",
+    options: [
+      "Define o título que aparece na aba do navegador",
+      "Faz a página se adaptar corretamente à largura da tela em celulares e tablets",
+      "Bloqueia o zoom em todos os dispositivos",
+      "Carrega o CSS mais rápido em telas pequenas"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: "Qual é a principal diferença entre as tags <div> e <span>?",
+    explicacao: "<div> é um elemento de bloco: ocupa toda a largura disponível e quebra a linha. <span> é em linha: fica no meio do texto, ocupando só o espaço do seu conteúdo.",
+    options: [
+      "<div> só funciona com CSS e <span> só funciona com JavaScript",
+      "<div> é um elemento de bloco e <span> é um elemento em linha (inline)",
+      "<div> é semântica e <span> é obsoleta",
+      "Não há diferença: são sinônimos"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: 'O que o atributo defer faz em uma tag <script src="...">?',
+    explicacao: "Com defer o script é baixado em paralelo e só executa depois que o HTML terminou de ser lido, mantendo a ordem dos scripts. Sem ele, o navegador para de montar a página para executar o script.",
+    options: [
+      "Impede que o script seja carregado",
+      "Baixa o script em paralelo e só o executa depois que o HTML foi todo lido",
+      "Faz o script executar antes de qualquer HTML",
+      "Adia o download do script até o usuário clicar em algo"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: 'Qual é a vantagem de usar <button type="submit">Enviar</button> em vez de <input type="submit" value="Enviar">?',
+    explicacao: "O <button> tem tag de abertura e fechamento, então aceita HTML dentro (um ícone, um <strong>). Já o <input> só mostra o texto simples do atributo value.",
+    options: [
+      "O <button> envia o formulário mais rápido",
+      "O <button> aceita conteúdo HTML dentro dele (ícones, outras tags), o <input> só um texto no value",
+      "O <input type=\"submit\"> não funciona em navegadores modernos",
+      "Só o <button> pode ficar dentro de um <form>"
+    ],
+    correct: 1
+  },
+
   // ---------- AVANÇADO (código) ----------
   {
     level: "avancado",
@@ -199,6 +248,86 @@ window.QUESTIONS_HTML = [
       const isButton = /<button[^>]*type="submit"[^>]*>enviar<\/button>/.test(n);
       const isInput = /<input[^>]*type="submit"[^>]*value="enviar"[^>]*>/.test(n);
       return isButton || isInput;
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie uma tabela com um cabeçalho <thead> com as colunas "Nome" e "Idade", e um corpo <tbody> com uma linha contendo "Ana" e "20".',
+    explicacao: "No <thead> as células são <th> (cabeçalho) e no <tbody> são <td> (dados). Essa separação ajuda leitores de tela a entenderem o que cada coluna significa.",
+    placeholder: "<table>\n  <thead>\n    <tr><th>...</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>...</td></tr>\n  </tbody>\n</table>",
+    solution: "<table>\n  <thead>\n    <tr>\n      <th>Nome</th>\n      <th>Idade</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Ana</td>\n      <td>20</td>\n    </tr>\n  </tbody>\n</table>",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /<table>/.test(n)
+        && /<thead>/.test(n)
+        && /<th>nome<\/th>/.test(n)
+        && /<th>idade<\/th>/.test(n)
+        && /<tbody>/.test(n)
+        && /<td>ana<\/td>/.test(n)
+        && /<td>20<\/td>/.test(n)
+        && /<\/table>/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie um <select> com name="cor" e três opções: "Azul", "Verde" e "Vermelho".',
+    explicacao: "O <select> é a caixa de seleção e cada <option> é uma escolha possível. O name fica no <select>, pois é ele quem envia o valor escolhido no formulário.",
+    placeholder: '<select name="cor">\n  <option>...</option>\n</select>',
+    solution: '<select name="cor">\n  <option value="azul">Azul</option>\n  <option value="verde">Verde</option>\n  <option value="vermelho">Vermelho</option>\n</select>',
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /<select[^>]*name="cor"[^>]*>/.test(n)
+        && /<option[^>]*>azul<\/option>/.test(n)
+        && /<option[^>]*>verde<\/option>/.test(n)
+        && /<option[^>]*>vermelho<\/option>/.test(n)
+        && /<\/select>/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie um menu de navegação <nav> com dois links: "Início" apontando para "index.html" e "Contato" apontando para "contato.html".',
+    explicacao: "A tag <nav> marca semanticamente um bloco de navegação. Isso permite que leitores de tela ofereçam \"pular para o menu\" ou \"pular o menu\" direto para o conteúdo.",
+    placeholder: '<nav>\n  <a href="...">...</a>\n</nav>',
+    solution: '<nav>\n  <a href="index.html">Início</a>\n  <a href="contato.html">Contato</a>\n</nav>',
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /<nav>/.test(n)
+        && /<a[^>]*href="index\.html"[^>]*>início<\/a>/.test(n)
+        && /<a[^>]*href="contato\.html"[^>]*>contato<\/a>/.test(n)
+        && /<\/nav>/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie um <form> que envie os dados para "/cadastro" usando o método POST, contendo um botão de envio com o texto "Enviar".',
+    explicacao: "O action diz PARA ONDE os dados vão e o method diz COMO eles vão. Com POST os dados seguem no corpo da requisição, sem ficar visíveis na URL.",
+    placeholder: '<form action="..." method="...">\n  <button type="submit">Enviar</button>\n</form>',
+    solution: '<form action="/cadastro" method="post">\n  <button type="submit">Enviar</button>\n</form>',
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /<form[^>]*action="\/cadastro"[^>]*>/.test(n)
+        && /<form[^>]*method="post"[^>]*>/.test(n)
+        && /<\/form>/.test(n)
+        && /(<button[^>]*>enviar<\/button>|<input[^>]*value="enviar"[^>]*>)/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie um <label> com o texto "Nome" corretamente associado a um <input> de texto que tenha id="nome" e name="nome".',
+    explicacao: "O for do <label> precisa ter exatamente o mesmo valor do id do <input>. Assim clicar no texto já foca o campo e o leitor de tela anuncia o rótulo certo.",
+    placeholder: '<label for="...">Nome</label>\n<input type="text" id="..." name="...">',
+    solution: '<label for="nome">Nome</label>\n<input type="text" id="nome" name="nome">',
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /<label[^>]*for="nome"[^>]*>nome<\/label>/.test(n)
+        && /<input[^>]*id="nome"[^>]*>/.test(n)
+        && /<input[^>]*type="text"[^>]*>/.test(n)
+        && /<input[^>]*name="nome"[^>]*>/.test(n);
     }
   }
 ];

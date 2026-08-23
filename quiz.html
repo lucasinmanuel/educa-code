@@ -14,6 +14,7 @@
         <nav class="site-nav">
           <a href="index.html">Início</a>
           <a href="aprender.html">Aprender</a>
+          <a href="pratica.html">Praticar</a>
         </nav>
         <div class="score-pill" id="scorePill">Perguntas &middot; <span id="scoreValue">0</span> de <span id="scoreMax">0</span> pontos</div>
       </div>
@@ -27,14 +28,16 @@
         <h1 id="quizTitle" class="quiz-title"></h1>
         <span id="bestBadge" class="best-badge hidden"></span>
       </div>
-      <nav id="levelTabs" class="level-tabs"></nav>
+      <nav id="levelTabs" class="level-tabs" aria-label="Dificuldade"></nav>
+      <nav id="faseTabs" class="fase-tabs" aria-label="Fase"></nav>
       <div id="questionList" class="question-list"></div>
 
       <div id="resultBanner" class="result-banner hidden">
         <p id="resultText"></p>
         <p id="bestText" class="best-text hidden"></p>
         <div class="result-actions">
-          <button id="retryBtn" class="btn btn-primary">Refazer quiz</button>
+          <a id="nextFaseBtn" class="btn btn-primary hidden" href="#"></a>
+          <button id="retryBtn" class="btn btn-secondary">Refazer</button>
           <a href="index.html" class="btn btn-secondary">Escolher outro módulo</a>
         </div>
       </div>
@@ -59,6 +62,7 @@
 
   <script src="js/acronyms.js"></script>
   <script src="js/progress.js"></script>
+  <script src="js/fases.js"></script>
   <script src="js/questions-html.js"></script>
   <script src="js/questions-css.js"></script>
   <script src="js/questions-js.js"></script>

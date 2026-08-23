@@ -130,6 +130,55 @@ window.QUESTIONS_CSS = [
     correct: 1
   },
 
+  {
+    level: "intermediario",
+    question: "Como se usa o valor guardado em uma variável CSS (custom property) como --cor-principal?",
+    explicacao: "A variável é criada com dois traços (--cor-principal: azul) e usada com a função var(--cor-principal). Assim você troca a cor em um lugar só e a mudança vale para a página inteira.",
+    options: [
+      "cor: --cor-principal",
+      "cor: var(--cor-principal)",
+      "cor: $cor-principal",
+      "cor: get(--cor-principal)"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: "Qual é a diferença entre position: fixed e position: sticky?",
+    explicacao: "fixed gruda na tela desde sempre e nunca sai do lugar ao rolar. sticky começa normal, no fluxo da página, e só passa a grudar quando você rola e ele atinge a posição definida (por exemplo, top: 0).",
+    options: [
+      "Não há diferença, são sinônimos",
+      "fixed fica preso à janela o tempo todo; sticky rola junto e só gruda ao atingir a posição definida",
+      "sticky fica preso à janela o tempo todo; fixed nunca gruda",
+      "fixed só funciona em imagens e sticky só em textos"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: "Qual a diferença entre visibility: hidden e display: none?",
+    explicacao: "Com visibility: hidden o elemento fica invisível mas continua ocupando o espaço dele no layout. Com display: none ele some por completo e o espaço é fechado pelos outros elementos.",
+    options: [
+      "São exatamente iguais",
+      "visibility: hidden esconde o elemento mas mantém o espaço ocupado; display: none remove o elemento do layout",
+      "display: none apenas deixa o elemento transparente",
+      "visibility: hidden apaga o elemento do HTML"
+    ],
+    correct: 1
+  },
+  {
+    level: "intermediario",
+    question: "Para que serve a propriedade z-index?",
+    explicacao: "z-index define a ordem de empilhamento: quem tem número maior aparece na frente. Ele só faz efeito em elementos posicionados (relative, absolute, fixed ou sticky), nunca em position: static.",
+    options: [
+      "Define a largura do elemento na tela",
+      "Controla qual elemento fica na frente ou atrás quando eles se sobrepõem",
+      "Aumenta o zoom do elemento",
+      "Define a ordem dos elementos dentro de um flex container"
+    ],
+    correct: 1
+  },
+
   // ---------- AVANÇADO (código) ----------
   {
     level: "avancado",
@@ -195,6 +244,73 @@ window.QUESTIONS_CSS = [
       return /\.card\{[^}]*padding:16px[^}]*\}/.test(n)
         && /box-shadow:[^;{}]+/.test(n)
         && /border-radius:12px/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Crie a variável CSS --cor-principal com o valor #3498db dentro de :root e depois use ela como cor de fundo (background-color) da classe "botao".',
+    explicacao: "Variáveis CSS são criadas com dois traços na frente do nome e costumam ficar em :root, que representa a página toda. Para usar o valor guardado, chame var(--nome-da-variavel).",
+    placeholder: ":root {\n  --cor-principal: #3498db;\n}\n\n.botao {\n  background-color: var(--cor-principal);\n}",
+    solution: ":root {\n  --cor-principal: #3498db;\n}\n\n.botao {\n  background-color: var(--cor-principal);\n}",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /:root\{[^}]*--cor-principal:#3498db[^}]*\}/.test(n)
+        && /\.botao\{[^}]*background(-color)?:var\(--cor-principal\)[^}]*\}/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Faça a classe "caixa" ter uma transição (transition) de opacidade de 0.5s e, ao passar o mouse por cima (:hover), ficar com opacity 0.5.',
+    explicacao: "A transition fica na regra normal do elemento, não no :hover — assim a animação acontece tanto ao entrar quanto ao sair com o mouse. O :hover apenas diz qual é o valor final.",
+    placeholder: ".caixa {\n  opacity: 1;\n  transition: opacity 0.5s;\n}\n\n.caixa:hover {\n  opacity: 0.5;\n}",
+    solution: ".caixa {\n  opacity: 1;\n  transition: opacity 0.5s;\n}\n\n.caixa:hover {\n  opacity: 0.5;\n}",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /\.caixa\{[^}]*transition:(opacity|all) 0?\.5s[^}]*\}/.test(n)
+        && /\.caixa:hover\{[^}]*opacity:0?\.5[^}]*\}/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Escreva uma regra para a classe "galeria" que crie um grid de 3 colunas iguais com 10px de espaço entre os itens.',
+    explicacao: "Com display: grid, o grid-template-columns define as colunas. repeat(3, 1fr) é um atalho para 1fr 1fr 1fr, ou seja, três colunas dividindo o espaço igualmente.",
+    placeholder: ".galeria {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}",
+    solution: ".galeria {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /\.galeria\{[^}]*display:grid[^}]*\}/.test(n)
+        && /grid-template-columns:(repeat\(3,1fr\)|1fr 1fr 1fr)/.test(n)
+        && /gap:10px/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: "Escreva uma regra que, ao passar o mouse por cima de qualquer tag <button>, deixe o fundo verde (green) e mostre o cursor de mãozinha (pointer).",
+    explicacao: ":hover é uma pseudoclasse: ela descreve um estado do elemento, e não um elemento diferente. Por isso vem colada no seletor, como em button:hover.",
+    placeholder: "button:hover {\n  background-color: green;\n  cursor: pointer;\n}",
+    solution: "button:hover {\n  background-color: green;\n  cursor: pointer;\n}",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /button:hover\{[^}]*background(-color)?:(green|#008000)[^}]*\}/.test(n)
+        && /button:hover\{[^}]*cursor:pointer[^}]*\}/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: 'Escreva uma regra para a classe "lista" que empilhe os itens em coluna usando flexbox, com 20px de espaço entre eles.',
+    explicacao: "Por padrão o flex coloca os itens lado a lado (row). Com flex-direction: column eles passam a ficar um embaixo do outro, e o gap cuida do espaço entre eles.",
+    placeholder: ".lista {\n  display: flex;\n  flex-direction: column;\n  gap: 20px;\n}",
+    solution: ".lista {\n  display: flex;\n  flex-direction: column;\n  gap: 20px;\n}",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /\.lista\{[^}]*display:flex[^}]*\}/.test(n)
+        && /flex-direction:column/.test(n)
+        && /gap:20px/.test(n);
     }
   }
 ];

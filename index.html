@@ -14,6 +14,7 @@
         <nav class="site-nav">
           <a href="index.html" class="active">Início</a>
           <a href="aprender.html">Aprender</a>
+          <a href="pratica.html">Praticar</a>
         </nav>
       </div>
     </header>
@@ -51,6 +52,15 @@
         </div>
       </div>
 
+      <a class="pratica-card" href="pratica.html">
+        <div class="pratica-icone">🧪</div>
+        <div class="pratica-texto">
+          <h2>Teste Prático</h2>
+          <p>Escreva código de verdade e veja o resultado na hora, lado a lado.</p>
+        </div>
+        <span class="pratica-seta" aria-hidden="true">→</span>
+      </a>
+
       <div id="resetWrap" class="reset-wrap hidden">
         <button type="button" id="resetBtn" class="reset-btn">Apagar meu progresso</button>
       </div>
@@ -75,6 +85,7 @@
 
   <script src="js/acronyms.js"></script>
   <script src="js/progress.js"></script>
+  <script src="js/fases.js"></script>
   <script src="js/questions-html.js"></script>
   <script src="js/questions-css.js"></script>
   <script src="js/questions-js.js"></script>
@@ -86,57 +97,103 @@
     ];
     const BANKS = { html: window.QUESTIONS_HTML, css: window.QUESTIONS_CSS, js: window.QUESTIONS_JS };
 
-    const LEVEL_KEYS = LEVELS.map(l => l.key);
+    // Quantas fases cada nível tem, por módulo.
+    function fasesPorNivel(mod) {
+      const bank = BANKS[mod] || [];
+      const r = {};
+      LEVELS.forEach(l => { r[l.key] = window.Fases.doNivel(bank, l.key).length; });
+      return r;
+    }
 
     document.querySelectorAll('.module-count').forEach(el => {
       const bank = BANKS[el.dataset.modulo] || [];
       el.textContent = bank.length + ' perguntas';
     });
 
-    // Bolinhas de progresso do módulo: ● concluído, ◐ iniciado, ○ nunca feito
     document.querySelectorAll('.module-progress').forEach(el => {
       if (!window.Progresso) return;
       const mod = el.dataset.moduloProgress;
-      const r = window.Progresso.resumoModulo(mod, LEVEL_KEYS);
-      if (r.iniciados === 0) return;
+      const r = window.Progresso.resumoModulo(mod, fasesPorNivel(mod));
+      if (r.iniciadas === 0) return;
 
-      el.textContent = `${r.concluidos} de ${r.total} níveis concluídos`;
+      el.textContent = `${r.concluidas} de ${r.total} fases concluídas`;
       el.classList.remove('hidden');
-      if (r.concluidos === r.total) el.classList.add('complete');
+      if (r.concluidas === r.total) el.classList.add('complete');
     });
 
     document.querySelectorAll('.level-links').forEach(el => {
       const mod = el.dataset.moduloLinks;
       const bank = BANKS[mod] || [];
+
       LEVELS.forEach(level => {
-        const count = bank.filter(q => (q.level || 'iniciante') === level.key).length;
-        const link = document.createElement('a');
-        link.className = 'level-link' + (count === 0 ? ' disabled' : '');
-        link.href = `quiz.html?modulo=${mod}&nivel=${level.key}`;
+        const fases = window.Fases.doNivel(bank, level.key);
+        if (!fases.length) return;
+
+        const grupo = document.createElement('div');
+        grupo.className = 'nivel-grupo';
+
+        const cab = document.createElement('div');
+        cab.className = 'nivel-cabecalho';
 
         const nome = document.createElement('span');
-        nome.textContent = `${level.label} (${count})`;
-        link.appendChild(nome);
+        nome.className = 'nivel-nome';
+        nome.textContent = level.label;
+        cab.appendChild(nome);
 
-        const salvo = window.Progresso && window.Progresso.obter(mod, level.key);
-        if (salvo) {
-          const nota = document.createElement('span');
-          const concluido = salvo.total > 0 && salvo.melhor === salvo.total;
-          nota.className = 'level-score' + (concluido ? ' done' : '');
-          nota.textContent = concluido ? `🏆 ${salvo.melhor}/${salvo.total}` : `${salvo.melhor}/${salvo.total}`;
-          link.appendChild(nota);
-          link.classList.add('has-score');
+        if (window.Progresso) {
+          const r = window.Progresso.resumoNivel(mod, level.key, fases.length);
+          const cont = document.createElement('span');
+          cont.className = 'nivel-contador' + (r.concluidas === r.total ? ' done' : '');
+          cont.textContent = `${r.concluidas}/${r.total}`;
+          cab.appendChild(cont);
         }
 
-        el.appendChild(link);
+        grupo.appendChild(cab);
+
+        // Uma "pastilha" por fase, com o número dentro.
+        const linha = document.createElement('div');
+        linha.className = 'fase-linha';
+
+        fases.forEach((perguntas, i) => {
+          const n = i + 1;
+          const liberada = !window.Progresso || window.Progresso.liberada(mod, level.key, n);
+
+          // Fase trancada vira <span>: sem link, sem foco de teclado.
+          const el = document.createElement(liberada ? 'a' : 'span');
+          el.className = 'fase-pill';
+
+          if (liberada) {
+            el.href = `quiz.html?modulo=${mod}&nivel=${level.key}&fase=${n}`;
+            el.textContent = n;
+            el.title = `${level.label} · Fase ${n} — ${perguntas.length} perguntas`;
+
+            const salvo = window.Progresso && window.Progresso.obter(mod, level.key, n);
+            if (salvo) {
+              const feito = salvo.total > 0 && salvo.melhor === salvo.total;
+              el.classList.add(feito ? 'done' : 'started');
+              el.title += feito ? ' (concluída)' : ` — melhor: ${salvo.melhor}/${salvo.total}`;
+            }
+          } else {
+            el.classList.add('locked');
+            el.textContent = '🔒';
+            el.title = `Fase ${n} trancada — conclua a fase ${n - 1} com nota máxima para liberar`;
+            el.setAttribute('aria-label', el.title);
+          }
+
+          linha.appendChild(el);
+        });
+
+        grupo.appendChild(linha);
+        el.appendChild(grupo);
       });
     });
 
     // Botão de apagar progresso: só aparece se existe algo salvo.
     const resetWrap = document.getElementById('resetWrap');
-    const temProgresso = window.Progresso && Object.keys(BANKS).some(mod =>
-      LEVEL_KEYS.some(nivel => window.Progresso.obter(mod, nivel))
-    );
+    const temProgresso = window.Progresso && Object.keys(BANKS).some(mod => {
+      const f = fasesPorNivel(mod);
+      return Object.keys(f).some(nivel => window.Progresso.resumoNivel(mod, nivel, f[nivel]).iniciadas > 0);
+    });
 
     if (temProgresso) {
       resetWrap.classList.remove('hidden');

@@ -29,12 +29,25 @@
   const modulo = MODULES[moduloKey] || MODULES.html;
 
   const fullBank = modulo.bank();
-  let questions = fullBank.filter(q => (q.level || "iniciante") === nivelKey);
+
+  // O nível é dividido em fases; cada fase é um quiz independente.
+  const fases = window.Fases.doNivel(fullBank, nivelKey);
+  const faseParam = parseInt(params.get("fase"), 10);
+  const pedida = (faseParam >= 1 && faseParam <= fases.length) ? faseParam : 1;
+
+  // Fase trancada não abre nem digitando a URL na mão: cai na última liberada.
+  const bloqueada = window.Progresso && !window.Progresso.liberada(moduloKey, nivelKey, pedida);
+  const faseNum = bloqueada
+    ? window.Progresso.ultimaLiberada(moduloKey, nivelKey, fases.length)
+    : pedida;
+
+  let questions = fases[faseNum - 1] || [];
   const POINTS_PER_QUESTION = 2;
   let scoreMax = questions.length * POINTS_PER_QUESTION;
 
   const titleEl = document.getElementById("quizTitle");
   const tabsEl = document.getElementById("levelTabs");
+  const faseTabsEl = document.getElementById("faseTabs");
   const listEl = document.getElementById("questionList");
   const scoreValueEl = document.getElementById("scoreValue");
   const scoreMaxEl = document.getElementById("scoreMax");
@@ -44,6 +57,7 @@
   const srAnnouncer = document.getElementById("srAnnouncer");
   const bestText = document.getElementById("bestText");
   const bestBadge = document.getElementById("bestBadge");
+  const nextFaseBtn = document.getElementById("nextFaseBtn");
 
   const levelLabel = (LEVELS.find(l => l.key === nivelKey) || LEVELS[0]).label;
   titleEl.textContent = `${modulo.title} — ${levelLabel}`;
@@ -52,13 +66,48 @@
   function renderTabs() {
     tabsEl.innerHTML = "";
     LEVELS.forEach(level => {
-      const count = fullBank.filter(q => (q.level || "iniciante") === level.key).length;
+      const total = window.Fases.doNivel(fullBank, level.key).length;
       const tab = document.createElement("a");
       tab.className = "level-tab" + (level.key === nivelKey ? " active" : "");
-      tab.href = `quiz.html?modulo=${moduloKey}&nivel=${level.key}`;
-      tab.textContent = `${level.label} (${count})`;
-      if (count === 0) tab.classList.add("disabled");
+      tab.href = `quiz.html?modulo=${moduloKey}&nivel=${level.key}&fase=1`;
+      tab.textContent = level.label;
+      if (total === 0) tab.classList.add("disabled");
       tabsEl.appendChild(tab);
+    });
+  }
+
+  function renderFaseTabs() {
+    faseTabsEl.innerHTML = "";
+    if (fases.length <= 1) return;
+
+    const rotulo = document.createElement("span");
+    rotulo.className = "fase-rotulo";
+    rotulo.textContent = "Fase";
+    faseTabsEl.appendChild(rotulo);
+
+    fases.forEach((perguntas, i) => {
+      const n = i + 1;
+      const liberada = !window.Progresso || window.Progresso.liberada(moduloKey, nivelKey, n);
+
+      const tab = document.createElement(liberada ? "a" : "span");
+      tab.className = "fase-tab" + (n === faseNum ? " active" : "");
+
+      if (liberada) {
+        tab.href = `quiz.html?modulo=${moduloKey}&nivel=${nivelKey}&fase=${n}`;
+        tab.textContent = String(n);
+        tab.title = `Fase ${n} — ${perguntas.length} perguntas`;
+        if (window.Progresso && window.Progresso.concluida(moduloKey, nivelKey, n)) {
+          tab.classList.add("done");
+          tab.title += " (concluída)";
+        }
+      } else {
+        tab.classList.add("locked");
+        tab.textContent = "🔒";
+        tab.title = `Fase ${n} trancada — conclua a fase ${n - 1} com nota máxima`;
+        tab.setAttribute("aria-label", tab.title);
+      }
+
+      faseTabsEl.appendChild(tab);
     });
   }
 
@@ -84,19 +133,47 @@
     // Guarda o resultado antes de comparar, para o texto refletir o recorde novo.
     let recorde = null;
     if (window.Progresso) {
-      const anterior = window.Progresso.obter(moduloKey, nivelKey);
-      recorde = window.Progresso.salvar(moduloKey, nivelKey, score, scoreMax);
+      const anterior = window.Progresso.obter(moduloKey, nivelKey, faseNum);
+      recorde = window.Progresso.salvar(moduloKey, nivelKey, faseNum, score, scoreMax);
 
       if (score === scoreMax) {
-        bestText.textContent = "🏆 Nível concluído com nota máxima!";
+        bestText.textContent = fases.length > 1
+          ? `🏆 Fase ${faseNum} concluída com nota máxima!`
+          : "🏆 Nível concluído com nota máxima!";
       } else if (anterior && anterior.melhor > score) {
         bestText.textContent = `Seu recorde neste nível continua sendo ${anterior.melhor} de ${scoreMax}.`;
       } else if (anterior && recorde.melhor > anterior.melhor) {
         bestText.textContent = `🎉 Novo recorde! Antes era ${anterior.melhor} de ${scoreMax}.`;
       } else {
-        bestText.textContent = `Tentativa ${recorde.tentativas} neste nível.`;
+        bestText.textContent = `Tentativa ${recorde.tentativas} nesta fase.`;
       }
       bestText.classList.remove("hidden");
+    }
+
+    // Caminho natural depois de terminar: seguir para a próxima fase.
+    // Ela só libera com nota máxima, então o botão só aparece nesse caso.
+    const proximaLiberada = !window.Progresso ||
+      window.Progresso.liberada(moduloKey, nivelKey, faseNum + 1);
+
+    if (nextFaseBtn) {
+      if (faseNum < fases.length && !proximaLiberada) {
+        nextFaseBtn.classList.add("hidden");
+        bestText.textContent = `Faça ${scoreMax} de ${scoreMax} nesta fase para destrancar a fase ${faseNum + 1}. 🔒`;
+        bestText.classList.remove("hidden");
+      } else if (faseNum < fases.length) {
+        nextFaseBtn.href = `quiz.html?modulo=${moduloKey}&nivel=${nivelKey}&fase=${faseNum + 1}`;
+        nextFaseBtn.textContent = `Fase ${faseNum + 1} →`;
+        nextFaseBtn.classList.remove("hidden");
+      } else {
+        const proximo = LEVELS[LEVELS.findIndex(l => l.key === nivelKey) + 1];
+        if (proximo && window.Fases.doNivel(fullBank, proximo.key).length) {
+          nextFaseBtn.href = `quiz.html?modulo=${moduloKey}&nivel=${proximo.key}&fase=1`;
+          nextFaseBtn.textContent = `Ir para ${proximo.label} →`;
+          nextFaseBtn.classList.remove("hidden");
+        } else {
+          nextFaseBtn.classList.add("hidden");
+        }
+      }
     }
 
     resultBanner.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -386,9 +463,9 @@
 
   retryBtn.addEventListener("click", resetQuiz);
 
-  // Mostra o recorde anterior deste nível, se houver.
+  // Mostra o recorde anterior desta fase, se houver.
   if (window.Progresso && bestBadge) {
-    const salvo = window.Progresso.obter(moduloKey, nivelKey);
+    const salvo = window.Progresso.obter(moduloKey, nivelKey, faseNum);
     if (salvo) {
       const concluido = salvo.total > 0 && salvo.melhor === salvo.total;
       bestBadge.textContent = concluido
@@ -401,5 +478,6 @@
 
   document.body.classList.add(`theme-${modulo.cls}`);
   renderTabs();
+  renderFaseTabs();
   renderQuestions();
 })();

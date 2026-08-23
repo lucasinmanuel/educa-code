@@ -274,5 +274,43 @@ window.QUESTIONS_JS = [
       const n = window.normalizeCode(code);
       return /const\s*dobro\s*=\s*\(?x\)?\s*=>\s*x\*2/.test(n);
     }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: "Escreva um código que use array.filter para criar um novo array apenas com os números MAIORES que 10 de um array chamado numeros.",
+    explicacao: "filter() testa cada item e guarda só os que retornam true, devolvendo um array novo. O array numeros original continua do jeito que estava.",
+    placeholder: "const maiores = numeros.filter(n => n > 10);",
+    solution: "const maiores = numeros.filter(n => n > 10);",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /numeros\.filter\(/.test(n) && />10/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: "Escreva um código que percorra um array chamado frutas usando forEach e imprima cada item no console.",
+    explicacao: "forEach() apenas percorre o array e executa a função para cada item, sem criar um array novo. Quando você quer transformar os valores, o método certo é o map().",
+    placeholder: "frutas.forEach(item => {\n  console.log(item);\n});",
+    solution: "frutas.forEach(item => {\n  console.log(item);\n});",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      return /frutas\.foreach\(/.test(n) && /console\.log\(\w+\)/.test(n);
+    }
+  },
+  {
+    level: "avancado",
+    type: "code",
+    question: "Escreva um código que use array.reduce para somar todos os valores de um array chamado numeros, começando do zero.",
+    explicacao: "reduce() carrega um acumulador de item em item e devolve um único valor no final. O 0 no fim é o valor inicial do acumulador, importante para o array vazio não dar erro.",
+    placeholder: "const total = numeros.reduce((acc, n) => acc + n, 0);",
+    solution: "const total = numeros.reduce((acc, n) => acc + n, 0);",
+    check: function (code) {
+      const n = window.normalizeCode(code);
+      const usaReduce = /numeros\.reduce\(/.test(n);
+      const soma = /=>\w+\+\w+/.test(n) || /return\s*\w+\+\w+/.test(n);
+      return usaReduce && soma;
+    }
   }
 ];

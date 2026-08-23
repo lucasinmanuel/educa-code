@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste Prático - EducaCode</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app pratica-app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="logo" href="index.html">&lt;/&gt; EducaCode</a>
+        <nav class="site-nav">
+          <a href="index.html">Início</a>
+          <a href="aprender.html">Aprender</a>
+          <a href="pratica.html" class="active">Praticar</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="pratica-bar">
+      <label class="desafio-label" for="desafioSelect">Desafio</label>
+      <select id="desafioSelect" class="desafio-select"></select>
+      <button type="button" id="resetCodeBtn" class="ghost-btn" title="Voltar ao código inicial">Recomeçar</button>
+      <button type="button" id="checkBtn" class="btn btn-primary btn-sm">Verificar</button>
+    </div>
+
+    <div class="desafio-info" id="desafioInfo"></div>
+
+    <main class="split" id="split">
+      <section class="split-code">
+        <div class="code-tabs" id="codeTabs" role="tablist"></div>
+        <textarea id="editor" class="editor-area" spellcheck="false" aria-label="Editor de código"></textarea>
+      </section>
+
+      <section class="split-preview">
+        <div class="preview-bar">
+          <span>Resultado</span>
+          <span class="preview-hint">atualiza sozinho</span>
+        </div>
+        <iframe id="preview" class="preview-frame" title="Resultado do seu código" sandbox="allow-scripts"></iframe>
+      </section>
+    </main>
+
+    <div id="checkResult" class="check-result hidden" role="status" aria-live="polite"></div>
+
+    <footer class="footer">
+      <p>Este conteúdo não foi criado nem aprovado por terceiros. Feito para fins educativos.</p>
+      <p class="license-note">Licenciado sob <a href="LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></p>
+      <div class="author">
+        <img class="author-photo" src="https://github.com/lucasinmanuel.png" alt="Foto de Lucas Emanuel Santana dos Santos">
+        <div class="author-info">
+          <span class="author-name">Lucas Emanuel Santana dos Santos</span>
+          <div class="author-links">
+            <a href="https://www.linkedin.com/in/lucasinmanuel/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <span class="author-sep">&middot;</span>
+            <a href="https://github.com/lucasinmanuel" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/progress.js"></script>
+  <script src="js/desafios.js"></script>
+  <script src="js/pratica.js"></script>
+</body>
+</html>
