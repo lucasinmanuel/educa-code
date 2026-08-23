@@ -434,7 +434,9 @@
 
       const badge = document.createElement("span");
       badge.className = "q-badge";
-      badge.textContent = `0/${POINTS_PER_QUESTION}`;
+      // Antes de responder mostra quanto a pergunta VALE. Só depois vira nota
+      // ("0/2" antes de responder parecia que o aluno já tinha zerado).
+      badge.textContent = `vale ${POINTS_PER_QUESTION}`;
       header.appendChild(badge);
 
       card.appendChild(header);
