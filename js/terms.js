@@ -12,22 +12,22 @@ window.TERMS = [
       <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
     </marker>
   </defs>
-  <rect x="14" y="52" width="150" height="76" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <text x="89" y="86" font-size="17" text-anchor="middle" font-weight="650">Usuário</text>
-  <text x="89" y="108" font-size="13.5" text-anchor="middle" class="s2">clica e digita</text>
+  <rect x="16" y="52" width="136" height="76" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
+  <text x="84" y="86" font-size="17" text-anchor="middle" font-weight="650">Usuário</text>
+  <text x="84" y="108" font-size="13.5" text-anchor="middle" class="s2">clica e digita</text>
 
-  <line x1="170" y1="90" x2="218" y2="90" stroke="currentColor" stroke-width="2" marker-end="url(#fe-n)"/>
+  <line x1="158" y1="90" x2="224" y2="90" stroke="currentColor" stroke-width="2" marker-end="url(#fe-n)"/>
 
-  <rect x="226" y="46" width="150" height="88" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.6"/>
-  <text x="301" y="82" font-size="17" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Frontend</text>
-  <text x="301" y="104" font-size="13.5" text-anchor="middle" fill="var(--purple-dark)">telas e botões</text>
+  <rect x="230" y="46" width="136" height="88" rx="10" fill="var(--purple-soft)" stroke="var(--purple)" stroke-width="2.6"/>
+  <text x="298" y="82" font-size="17" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Frontend</text>
+  <text x="298" y="104" font-size="13.5" text-anchor="middle" fill="var(--purple-dark)">telas e botões</text>
 
-  <line x1="382" y1="90" x2="430" y2="90" stroke="currentColor" stroke-width="2" marker-end="url(#fe-n)"/>
-  <text x="406" y="76" font-size="12.5" text-anchor="middle" class="s2">pede dados</text>
+  <line x1="372" y1="90" x2="438" y2="90" stroke="currentColor" stroke-width="2" marker-end="url(#fe-n)"/>
+  <text x="405" y="76" font-size="12" text-anchor="middle" class="s2">pede dados</text>
 
-  <rect x="438" y="52" width="150" height="76" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <text x="513" y="86" font-size="17" text-anchor="middle" font-weight="650">Backend</text>
-  <text x="513" y="108" font-size="13.5" text-anchor="middle" class="s2">no servidor</text>
+  <rect x="444" y="52" width="136" height="76" rx="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
+  <text x="512" y="86" font-size="17" text-anchor="middle" font-weight="650">Backend</text>
+  <text x="512" y="108" font-size="13.5" text-anchor="middle" class="s2">no servidor</text>
 
   <text x="300" y="26" font-size="14" text-anchor="middle" class="s2">roda no navegador do usuário</text>
 </svg>`
@@ -176,7 +176,7 @@ window.TERMS = [
   <text x="504" y="161" font-size="16" text-anchor="middle" font-weight="700" fill="var(--purple-dark)">Produtos</text>
   <text x="504" y="183" font-size="12.5" text-anchor="middle" fill="var(--purple-dark)">preço · estoque</text>
 
-  <text x="300" y="120" font-size="13" text-anchor="middle" class="s2">tabelas</text>
+  <text x="198" y="116" font-size="13" text-anchor="middle" class="s2">tabelas</text>
 </svg>`
   },
   {
