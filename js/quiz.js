@@ -41,6 +41,9 @@
   const resultBanner = document.getElementById("resultBanner");
   const resultText = document.getElementById("resultText");
   const retryBtn = document.getElementById("retryBtn");
+  const srAnnouncer = document.getElementById("srAnnouncer");
+  const bestText = document.getElementById("bestText");
+  const bestBadge = document.getElementById("bestBadge");
 
   const levelLabel = (LEVELS.find(l => l.key === nivelKey) || LEVELS[0]).label;
   titleEl.textContent = `${modulo.title} — ${levelLabel}`;
@@ -77,29 +80,89 @@
     else if (pct >= 50) msg = `Bom trabalho! Você fez ${score} de ${scoreMax} pontos (${pct}%). Continue praticando.`;
     else msg = `Você fez ${score} de ${scoreMax} pontos (${pct}%). Revise o conteúdo e tente novamente.`;
     resultText.textContent = msg;
+
+    // Guarda o resultado antes de comparar, para o texto refletir o recorde novo.
+    let recorde = null;
+    if (window.Progresso) {
+      const anterior = window.Progresso.obter(moduloKey, nivelKey);
+      recorde = window.Progresso.salvar(moduloKey, nivelKey, score, scoreMax);
+
+      if (score === scoreMax) {
+        bestText.textContent = "🏆 Nível concluído com nota máxima!";
+      } else if (anterior && anterior.melhor > score) {
+        bestText.textContent = `Seu recorde neste nível continua sendo ${anterior.melhor} de ${scoreMax}.`;
+      } else if (anterior && recorde.melhor > anterior.melhor) {
+        bestText.textContent = `🎉 Novo recorde! Antes era ${anterior.melhor} de ${scoreMax}.`;
+      } else {
+        bestText.textContent = `Tentativa ${recorde.tentativas} neste nível.`;
+      }
+      bestText.classList.remove("hidden");
+    }
+
     resultBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function announce(message) {
+    if (!srAnnouncer) return;
+    // Limpar antes força o leitor de tela a reanunciar mensagens repetidas.
+    srAnnouncer.textContent = "";
+    setTimeout(function () { srAnnouncer.textContent = message; }, 60);
   }
 
   function markQuestionResult(qIndex, isCorrect, card, badge, icon) {
     answered[qIndex] = true;
+    const q = questions[qIndex];
+
     if (isCorrect) {
       score += POINTS_PER_QUESTION;
       badge.textContent = `${POINTS_PER_QUESTION}/${POINTS_PER_QUESTION}`;
       icon.textContent = "✔";
       icon.classList.add("correct");
       card.classList.add("card-correct");
+      announce(`Correto. ${POINTS_PER_QUESTION} pontos. Placar: ${score} de ${scoreMax}.`);
     } else {
       badge.textContent = `0/${POINTS_PER_QUESTION}`;
       icon.textContent = "✘";
       icon.classList.add("incorrect");
       card.classList.add("card-incorrect");
+      const certa = q.type === "code" ? q.solution : q.options[q.correct];
+      announce(`Incorreto. A resposta certa é: ${certa}. Placar: ${score} de ${scoreMax}.`);
     }
     updateScore();
+  }
+
+  /** Bloco "Por quê?" — aparece ao responder, tanto no acerto quanto no erro. */
+  function buildExplanation(q) {
+    if (!q.explicacao) return null;
+
+    const wrap = document.createElement("div");
+    wrap.className = "explicacao hidden";
+
+    const label = document.createElement("p");
+    label.className = "explicacao-label";
+    label.textContent = "Por quê?";
+
+    const texto = document.createElement("p");
+    texto.className = "explicacao-texto";
+    texto.textContent = q.explicacao;
+
+    wrap.appendChild(label);
+    wrap.appendChild(texto);
+    return wrap;
+  }
+
+  function revealExplanation(card) {
+    const bloco = card.querySelector(".explicacao");
+    if (bloco) bloco.classList.remove("hidden");
   }
 
   function renderMultipleChoice(q, qIndex, card, badge, icon) {
     const optionsWrap = document.createElement("div");
     optionsWrap.className = "options";
+    // Agrupa as alternativas para o leitor de tela ler "1 de 4" e associar
+    // o grupo ao enunciado da pergunta.
+    optionsWrap.setAttribute("role", "radiogroup");
+    optionsWrap.setAttribute("aria-labelledby", `qtext-${qIndex}`);
 
     q.options.forEach((optionText, oIndex) => {
       const option = document.createElement("label");
@@ -140,6 +203,7 @@
         if (!isCorrect) {
           card.querySelector(".correct-answer").classList.remove("hidden");
         }
+        revealExplanation(card);
         markQuestionResult(qIndex, isCorrect, card, badge, icon);
       });
 
@@ -177,6 +241,9 @@
     correctWrap.appendChild(correctOption);
 
     card.appendChild(correctWrap);
+
+    const explicacao = buildExplanation(q);
+    if (explicacao) card.appendChild(explicacao);
   }
 
   function renderCodeQuestion(q, qIndex, card, badge, icon) {
@@ -217,6 +284,9 @@
     solutionWrap.appendChild(solutionCode);
     card.appendChild(solutionWrap);
 
+    const explicacao = buildExplanation(q);
+    if (explicacao) card.appendChild(explicacao);
+
     function verify() {
       if (answered[qIndex]) return;
       const value = textarea.value.trim();
@@ -246,6 +316,7 @@
         solutionWrap.classList.remove("hidden");
       }
 
+      revealExplanation(card);
       markQuestionResult(qIndex, isCorrect, card, badge, icon);
     }
 
@@ -280,6 +351,7 @@
 
       const qText = document.createElement("p");
       qText.className = "q-text";
+      qText.id = `qtext-${qIndex}`;
       qText.textContent = q.question;
       header.appendChild(qText);
 
@@ -313,6 +385,19 @@
   }
 
   retryBtn.addEventListener("click", resetQuiz);
+
+  // Mostra o recorde anterior deste nível, se houver.
+  if (window.Progresso && bestBadge) {
+    const salvo = window.Progresso.obter(moduloKey, nivelKey);
+    if (salvo) {
+      const concluido = salvo.total > 0 && salvo.melhor === salvo.total;
+      bestBadge.textContent = concluido
+        ? `🏆 Melhor: ${salvo.melhor}/${salvo.total}`
+        : `Melhor: ${salvo.melhor}/${salvo.total}`;
+      bestBadge.classList.remove("hidden");
+      if (concluido) bestBadge.classList.add("done");
+    }
+  }
 
   document.body.classList.add(`theme-${modulo.cls}`);
   renderTabs();

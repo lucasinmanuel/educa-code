@@ -16,6 +16,19 @@
 
 * { box-sizing: border-box; }
 
+/* Visível apenas para leitores de tela. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
@@ -147,6 +160,101 @@ body {
 }
 
 .level-link:hover { background: #ede7f6; }
+
+.level-link.has-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.level-score {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray-text);
+  background: #fff;
+  border: 1px solid var(--gray-border);
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.level-score.done {
+  color: var(--green-text);
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+
+/* Progresso do módulo */
+.module-progress {
+  font-size: 0.78rem;
+  color: var(--gray-text);
+  margin: 10px 0 0;
+  font-weight: 600;
+}
+
+.module-progress.complete { color: var(--green-text); }
+.module-progress.hidden { display: none; }
+
+/* Apagar progresso */
+.reset-wrap {
+  margin-top: 32px;
+}
+
+.reset-wrap.hidden { display: none; }
+
+.reset-btn {
+  background: none;
+  border: 1px solid var(--gray-border);
+  color: var(--gray-text);
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  border-color: var(--red-border);
+  color: var(--red-text);
+  background: var(--red-bg);
+}
+
+/* Recorde no topo do quiz e no resultado */
+.quiz-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.best-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray-text);
+  background: #fff;
+  border: 1px solid var(--gray-border);
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.best-badge.done {
+  color: var(--green-text);
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+
+.best-badge.hidden { display: none; }
+
+/* Mais específico que ".result-banner p", para não precisar de !important. */
+.result-banner .best-text {
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  margin: -8px 0 16px;
+}
+
+.result-banner .best-text.hidden { display: none; }
 
 .level-link.disabled {
   color: var(--gray-text);
@@ -652,6 +760,15 @@ body.modal-open { overflow: hidden; }
   position: relative;
 }
 
+/* Foco visível no teclado: o input real tem 0x0 e opacity 0, então o
+   indicador precisa aparecer no círculo desenhado ao lado dele. */
+.option input:focus-visible + .radio-circle {
+  outline: 3px solid var(--purple);
+  outline-offset: 3px;
+}
+
+.option:has(input:focus-visible) { background: var(--purple-soft); }
+
 .option input:checked + .radio-circle { border-color: var(--purple); }
 .option input:checked + .radio-circle::after {
   content: "";
@@ -705,6 +822,33 @@ input:disabled ~ .option-text,
   border-color: #202124;
 }
 
+/* Explicação "Por quê?" */
+.explicacao {
+  margin-top: 14px;
+  background: var(--purple-soft);
+  border-left: 4px solid var(--purple);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px;
+}
+
+.explicacao.hidden { display: none; }
+
+.explicacao-label {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--purple-dark);
+}
+
+.explicacao-texto {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #202124;
+}
+
 /* Code question */
 .code-wrap { margin-top: 4px; }
 
@@ -721,8 +865,9 @@ input:disabled ~ .option-text,
   color: #202124;
 }
 
-.code-input:focus {
-  outline: none;
+.code-input:focus-visible {
+  outline: 3px solid var(--purple);
+  outline-offset: 2px;
   border-color: var(--purple);
 }
 
@@ -823,7 +968,6 @@ input:disabled ~ .option-text,
 .acronym:focus-visible {
   background: var(--purple-soft);
   border-radius: 3px;
-  outline: none;
 }
 
 .acronym:focus-visible {

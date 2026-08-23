@@ -19,13 +19,20 @@
       </div>
     </header>
 
+    <!-- Anuncia o resultado de cada resposta para leitores de tela. -->
+    <div id="srAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <main class="quiz-main">
-      <h1 id="quizTitle" class="quiz-title"></h1>
+      <div class="quiz-heading">
+        <h1 id="quizTitle" class="quiz-title"></h1>
+        <span id="bestBadge" class="best-badge hidden"></span>
+      </div>
       <nav id="levelTabs" class="level-tabs"></nav>
       <div id="questionList" class="question-list"></div>
 
       <div id="resultBanner" class="result-banner hidden">
         <p id="resultText"></p>
+        <p id="bestText" class="best-text hidden"></p>
         <div class="result-actions">
           <button id="retryBtn" class="btn btn-primary">Refazer quiz</button>
           <a href="index.html" class="btn btn-secondary">Escolher outro módulo</a>
@@ -51,6 +58,7 @@
   </div>
 
   <script src="js/acronyms.js"></script>
+  <script src="js/progress.js"></script>
   <script src="js/questions-html.js"></script>
   <script src="js/questions-css.js"></script>
   <script src="js/questions-js.js"></script>

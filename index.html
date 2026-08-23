@@ -28,6 +28,7 @@
           <h2>HTML</h2>
           <p>Estrutura, tags e semântica</p>
           <span class="module-count" data-modulo="html"></span>
+          <p class="module-progress hidden" data-modulo-progress="html"></p>
           <div class="level-links" data-modulo-links="html"></div>
         </div>
 
@@ -36,6 +37,7 @@
           <h2>CSS</h2>
           <p>Estilo, seletores e layout</p>
           <span class="module-count" data-modulo="css"></span>
+          <p class="module-progress hidden" data-modulo-progress="css"></p>
           <div class="level-links" data-modulo-links="css"></div>
         </div>
 
@@ -44,8 +46,13 @@
           <h2>JavaScript</h2>
           <p>Lógica, DOM e eventos</p>
           <span class="module-count" data-modulo="js"></span>
+          <p class="module-progress hidden" data-modulo-progress="js"></p>
           <div class="level-links" data-modulo-links="js"></div>
         </div>
+      </div>
+
+      <div id="resetWrap" class="reset-wrap hidden">
+        <button type="button" id="resetBtn" class="reset-btn">Apagar meu progresso</button>
       </div>
     </main>
 
@@ -67,6 +74,7 @@
   </div>
 
   <script src="js/acronyms.js"></script>
+  <script src="js/progress.js"></script>
   <script src="js/questions-html.js"></script>
   <script src="js/questions-css.js"></script>
   <script src="js/questions-js.js"></script>
@@ -78,9 +86,23 @@
     ];
     const BANKS = { html: window.QUESTIONS_HTML, css: window.QUESTIONS_CSS, js: window.QUESTIONS_JS };
 
+    const LEVEL_KEYS = LEVELS.map(l => l.key);
+
     document.querySelectorAll('.module-count').forEach(el => {
       const bank = BANKS[el.dataset.modulo] || [];
       el.textContent = bank.length + ' perguntas';
+    });
+
+    // Bolinhas de progresso do módulo: ● concluído, ◐ iniciado, ○ nunca feito
+    document.querySelectorAll('.module-progress').forEach(el => {
+      if (!window.Progresso) return;
+      const mod = el.dataset.moduloProgress;
+      const r = window.Progresso.resumoModulo(mod, LEVEL_KEYS);
+      if (r.iniciados === 0) return;
+
+      el.textContent = `${r.concluidos} de ${r.total} níveis concluídos`;
+      el.classList.remove('hidden');
+      if (r.concluidos === r.total) el.classList.add('complete');
     });
 
     document.querySelectorAll('.level-links').forEach(el => {
@@ -91,10 +113,40 @@
         const link = document.createElement('a');
         link.className = 'level-link' + (count === 0 ? ' disabled' : '');
         link.href = `quiz.html?modulo=${mod}&nivel=${level.key}`;
-        link.textContent = `${level.label} (${count})`;
+
+        const nome = document.createElement('span');
+        nome.textContent = `${level.label} (${count})`;
+        link.appendChild(nome);
+
+        const salvo = window.Progresso && window.Progresso.obter(mod, level.key);
+        if (salvo) {
+          const nota = document.createElement('span');
+          const concluido = salvo.total > 0 && salvo.melhor === salvo.total;
+          nota.className = 'level-score' + (concluido ? ' done' : '');
+          nota.textContent = concluido ? `🏆 ${salvo.melhor}/${salvo.total}` : `${salvo.melhor}/${salvo.total}`;
+          link.appendChild(nota);
+          link.classList.add('has-score');
+        }
+
         el.appendChild(link);
       });
     });
+
+    // Botão de apagar progresso: só aparece se existe algo salvo.
+    const resetWrap = document.getElementById('resetWrap');
+    const temProgresso = window.Progresso && Object.keys(BANKS).some(mod =>
+      LEVEL_KEYS.some(nivel => window.Progresso.obter(mod, nivel))
+    );
+
+    if (temProgresso) {
+      resetWrap.classList.remove('hidden');
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        if (confirm('Apagar todo o seu progresso salvo? Isso não pode ser desfeito.')) {
+          window.Progresso.limpar();
+          location.reload();
+        }
+      });
+    }
   </script>
 </body>
 </html>

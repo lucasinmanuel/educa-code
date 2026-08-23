@@ -5,40 +5,20 @@ contra o código atual (não são sugestões genéricas).
 
 ---
 
+## ✅ Concluído
+
+- **Salvar o progresso (localStorage)** — `js/progress.js` guarda a melhor nota, o número
+  de tentativas e a data por módulo+nível. A home mostra a nota de cada nível e quantos
+  foram concluídos; o quiz mostra o recorde no topo e avisa quando você bate um novo.
+  Resiste a aba anônima e a dados corrompidos sem quebrar o app.
+- **Explicar o "porquê" de cada resposta** — as 69 perguntas têm um campo `explicacao`,
+  exibido tanto no acerto (reforço) quanto no erro.
+- **Acessibilidade** — foco visível no teclado (`:focus-visible`), região `aria-live` que
+  anuncia acerto/erro e o placar, e `role="radiogroup"` associando as alternativas ao enunciado.
+
+---
+
 ## 🔴 Prioridade alta
-
-### 1. Salvar o progresso (localStorage)
-**Hoje:** nada é salvo. Recarregar a página perde tudo — nota, respostas, nível concluído.
-Esse é o maior buraco de UX de um app de estudo.
-
-**O que fazer:**
-- Guardar por módulo+nível: melhor nota, data da última tentativa, quais questões errou.
-- Mostrar na home: `HTML ✓✓○` (2 de 3 níveis concluídos) e a melhor nota em cada nível.
-- Botão "continuar de onde parei".
-
-**Onde:** novo `js/progress.js`; ler em `index.html`, gravar em `js/quiz.js` (`showResult`).
-
----
-
-### 2. Explicar o "porquê" de cada resposta
-**Hoje:** ao errar, o app mostra só *qual* era a correta — não explica *por quê*.
-É o maior ganho pedagógico pelo menor esforço do roadmap.
-
-**O que fazer:** adicionar um campo `explicacao` em cada pergunta e exibi-lo no bloco
-"Resposta correta". Também vale mostrar quando acerta (reforço).
-
-```js
-{
-  question: "...",
-  options: [...],
-  correct: 2,
-  explicacao: "O <h1> é o título de maior importância. O <title> aparece só na aba do navegador."
-}
-```
-
-**Onde:** `js/questions-*.js` (63 perguntas) + `renderMultipleChoice` em `js/quiz.js`.
-
----
 
 ### 3. Embaralhar perguntas e alternativas
 **Hoje:** a ordem é sempre idêntica. Na segunda tentativa dá pra decorar "é a terceira opção"
@@ -74,22 +54,14 @@ inspecionar o DOM/`getComputedStyle` — também comportamento, não string.
 
 ## 🟡 Prioridade média
 
-### 5. Acessibilidade — dois problemas reais confirmados
-- **Foco invisível no teclado:** os `input[type=radio]` estão escondidos com
-  `opacity: 0; width: 0` e não existe nenhuma regra `:focus`/`:focus-visible` para eles em
-  `css/style.css`. Quem navega por teclado **não enxerga onde está**. Corrigir com
-  `.option input:focus-visible + .radio-circle { outline: 2px solid var(--purple); }`.
-- **Resultado não é anunciado:** leitores de tela não avisam "correto/incorreto".
-  Adicionar uma região `aria-live="polite"` que anuncie o resultado de cada resposta.
-
 ### 6. Modo escuro
 Os diagramas do glossário já usam `currentColor` e variáveis CSS — adaptariam quase de graça.
 Faltaria só redefinir os tokens de `:root` sob `prefers-color-scheme: dark` + um botão de
 alternância salvo no localStorage.
 
 ### 7. Revisar só o que errou
-Depois do resultado: botão **"Refazer só as que errei"**. Combina com o item 1 (persistência)
-e é o que mais acelera o aprendizado.
+Depois do resultado: botão **"Refazer só as que errei"**. A persistência já está pronta —
+falta guardar *quais* questões foram erradas, não só a nota. É o que mais acelera o aprendizado.
 
 ### 8. Testes automatizados de verdade
 Já validamos ad-hoc que toda questão de código passa na própria solução e que o realce de
