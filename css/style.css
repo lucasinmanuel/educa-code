@@ -466,14 +466,81 @@ body {
   text-align: left;
 }
 
+.summary-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
 .summary-title {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--gray-text);
-  margin: 0 0 12px;
+  margin: 0;
   font-weight: 700;
 }
+
+/* Interruptor deslizante: a bolinha corre da esquerda para a direita */
+.switch-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch-texto {
+  font-size: 0.82rem;
+  color: var(--gray-text);
+  font-weight: 600;
+}
+
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-trilho {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #cfd3d9;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.switch-bolinha {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.switch-input:checked ~ .switch-trilho { background: var(--purple); }
+.switch-input:checked ~ .switch-trilho .switch-bolinha { transform: translateX(20px); }
+
+.switch-input:checked ~ .switch-texto,
+.switch-wrap:hover .switch-texto { color: var(--purple-dark); }
+
+.switch-input:focus-visible ~ .switch-trilho {
+  outline: 3px solid var(--purple);
+  outline-offset: 3px;
+}
+
+/* Destaque sutil enquanto o modo concreto está ligado */
+body.modo-real .term-figure { background: #fbfaff; border-radius: 10px; }
 
 .summary-list {
   list-style: none;

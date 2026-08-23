@@ -247,4 +247,39 @@
     window.applyAcronyms(summaryList);
     window.applyAcronyms(grid);
   }
+
+  // ---------- Modo "exemplos do dia a dia" ----------
+  // Cada <text data-real="..."> guarda a versão concreta. Ao ligar o modo,
+  // trocamos o conteúdo e guardamos o original em data-abstrato para voltar.
+  const CHAVE_MODO = "educacode:modo-real";
+  const toggle = document.getElementById("modoReal");
+
+  function aplicarModo(ligado) {
+    grid.querySelectorAll("text[data-real]").forEach(function (t) {
+      if (!t.dataset.abstrato) t.dataset.abstrato = t.textContent;
+      t.textContent = ligado ? t.dataset.real : t.dataset.abstrato;
+    });
+
+    grid.querySelectorAll(".term-figure figcaption").forEach(function (cap, i) {
+      const term = window.TERMS[i];
+      if (!term) return;
+      if (!cap.dataset.abstrato) cap.dataset.abstrato = cap.textContent;
+      cap.textContent = (ligado && term.captionReal) ? term.captionReal : cap.dataset.abstrato;
+    });
+
+    document.body.classList.toggle("modo-real", ligado);
+  }
+
+  if (toggle) {
+    let salvo = false;
+    try { salvo = localStorage.getItem(CHAVE_MODO) === "1"; } catch (e) { /* aba anônima */ }
+
+    toggle.checked = salvo;
+    aplicarModo(salvo);
+
+    toggle.addEventListener("change", function () {
+      aplicarModo(toggle.checked);
+      try { localStorage.setItem(CHAVE_MODO, toggle.checked ? "1" : "0"); } catch (e) { /* ignora */ }
+    });
+  }
 })();

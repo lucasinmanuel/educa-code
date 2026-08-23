@@ -24,7 +24,19 @@
       <p class="subtitle">Os termos que todo dev ouve — explicados em desenho, não em texto.</p>
 
       <nav class="summary" aria-label="Índice dos termos">
-        <p class="summary-title">Resumo</p>
+        <div class="summary-head">
+          <p class="summary-title">Resumo</p>
+
+          <!-- O input vem primeiro para o CSS alcançar os irmãos com "~".
+               Ele é invisível e não ocupa espaço, então a ordem visual
+               continua sendo texto + interruptor. -->
+          <label class="switch-wrap" for="modoReal">
+            <input type="checkbox" id="modoReal" class="switch-input">
+            <span class="switch-texto">Exemplos do dia a dia</span>
+            <span class="switch-trilho" aria-hidden="true"><span class="switch-bolinha"></span></span>
+          </label>
+        </div>
+
         <ol class="summary-list" id="summaryList"></ol>
       </nav>
 
