@@ -13,6 +13,8 @@
   const checkBtn = document.getElementById("checkBtn");
   const resetBtn = document.getElementById("resetCodeBtn");
   const resultEl = document.getElementById("checkResult");
+  const previewTitulo = document.getElementById("previewTitulo");
+  const previewDica = document.getElementById("previewDica");
 
   const CHAVE_RASCUNHO = "educacode:pratica:v1";
 
@@ -53,23 +55,149 @@
     );
   }
 
+  // Desafios de lógica não têm tela: o painel da direita vira um relatório
+  // dos casos de teste, que roda a cada tecla digitada.
+  function montarDocumentoLogica() {
+    const casos = escaparFechamento(JSON.stringify(desafio.casos), "script");
+    const fn = JSON.stringify(desafio.funcao);
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8">
+<style>
+  body { margin:0; font-family:"Segoe UI",Arial,sans-serif; font-size:13px; color:#202124; padding:14px; }
+  .resumo { font-weight:700; margin:0 0 12px; padding:10px 12px; border-radius:8px; }
+  .resumo.ok { background:#e6f4ea; color:#1e7e34; }
+  .resumo.nao { background:#fdf1da; color:#8a5a00; }
+  .resumo.falta { background:#fce8e6; color:#c5221f; }
+  .caso { border:1px solid #e2e4e9; border-radius:8px; padding:9px 11px; margin-bottom:7px; }
+  .caso.ok { border-color:#a8d5ba; background:#f4fbf6; }
+  .caso.falhou { border-color:#f0b3ad; background:#fef7f6; }
+  .linha1 { display:flex; gap:7px; align-items:baseline; }
+  .marca { font-weight:700; }
+  .caso.ok .marca { color:#1e7e34; }
+  .caso.falhou .marca { color:#c5221f; }
+  .desc { flex:1; }
+  code { font-family:Consolas,"Courier New",monospace; background:#f1f3f6; padding:1px 5px; border-radius:4px; font-size:12px; }
+  .detalhe { margin-top:6px; font-size:12px; color:#5f6368; }
+  .detalhe b { color:#202124; }
+  .erro { color:#c5221f; }
+</style>
+</head>
+<body>
+<div id="saida"></div>
+
+<script>
+window.__erroAluno = null;
+window.addEventListener("error", function (e) { window.__erroAluno = e.message; });
+<\/script>
+
+<script>
+${escaparFechamento(codigo.js, "script")}
+<\/script>
+
+<script>
+(function () {
+  var casos = ${casos};
+  var nome = ${fn};
+
+  function mostra(v) {
+    if (typeof v === "string") return '"' + v + '"';
+    if (v === undefined) return "undefined";
+    try { return JSON.stringify(v); } catch (e) { return String(v); }
+  }
+  // Normaliza o espaço fino que o toLocaleString("pt-BR") usa em "R$ 1,00",
+  // senao a comparacao de texto falharia por um caractere invisivel.
+  function norm(v) { return typeof v === "string" ? v.replace(/\\u00A0/g, " ") : v; }
+  function iguais(a, b) {
+    if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) < 1e-9;
+    return JSON.stringify(norm(a)) === JSON.stringify(norm(b));
+  }
+
+  var existe = false;
+  try { existe = eval("typeof " + nome) === "function"; } catch (e) {}
+
+  var out = casos.map(function (c) {
+    if (!existe) return { desc: c.desc, chamada: c.chamada, ok: false, faltando: true };
+    try {
+      var obtido = eval(c.chamada);
+      return { desc: c.desc, chamada: c.chamada, ok: iguais(obtido, c.esperado),
+               obtido: mostra(obtido), esperado: mostra(c.esperado) };
+    } catch (e) {
+      return { desc: c.desc, chamada: c.chamada, ok: false, erro: String(e.message || e) };
+    }
+  });
+
+  var acertos = out.filter(function (r) { return r.ok; }).length;
+  var html = "";
+
+  if (!existe) {
+    html += '<p class="resumo falta">A função <code>' + nome + '</code> ainda não existe.' +
+      (window.__erroAluno ? '<br><span class="erro">' + window.__erroAluno + '</span>' : '') + '</p>';
+  } else {
+    var cls = acertos === out.length ? "ok" : "nao";
+    html += '<p class="resumo ' + cls + '">' +
+      (acertos === out.length ? "Todos os casos passaram — " : "") +
+      acertos + " de " + out.length + " casos</p>";
+  }
+
+  out.forEach(function (r) {
+    html += '<div class="caso ' + (r.ok ? "ok" : "falhou") + '">' +
+      '<div class="linha1"><span class="marca">' + (r.ok ? "✔" : "✘") + '</span>' +
+      '<span class="desc">' + r.desc + '</span></div>' +
+      '<div class="detalhe"><code>' + r.chamada + '</code>';
+    if (r.erro) html += '<br><span class="erro">' + r.erro + '</span>';
+    else if (!r.ok && !r.faltando) html += '<br>esperado <b>' + r.esperado + '</b> · obtido <b>' + r.obtido + '</b>';
+    html += '</div></div>';
+  });
+
+  document.getElementById("saida").innerHTML = html;
+  parent.postMessage({ tipo: "educacode-checks", resultados: out.map(function (r) {
+    return { desc: r.desc, ok: r.ok };
+  }) }, "*");
+})();
+<\/script>
+</body>
+</html>`;
+  }
+
   function montarDocumento(comChecks) {
+    if (desafio.tipo === "logica") return montarDocumentoLogica();
+
     const testes = comChecks && desafio.checks.length
       ? escaparFechamento(JSON.stringify(desafio.checks), "script")
       : null;
 
+    const preparar = escaparFechamento(desafio.preparar || "", "script");
+
     // O script de checagem roda DENTRO do iframe e devolve o resultado por
     // postMessage. Assim o sandbox continua sem allow-same-origin.
+    // As verificações rodam EM SEQUÊNCIA, e cada uma pode pedir uma espera
+    // (`esperar`) — é assim que os desafios com Promise conseguem conferir o
+    // estado depois que o carregamento termina.
     const scriptChecks = testes ? `
 <script>
 (function () {
   function rodar() {
     var testes = ${testes};
-    var out = testes.map(function (t) {
-      try { return { desc: t.desc, ok: !!(new Function(t.teste))() }; }
-      catch (e) { return { desc: t.desc, ok: false, erro: String(e.message || e) }; }
-    });
-    parent.postMessage({ tipo: "educacode-checks", resultados: out }, "*");
+    var out = [];
+    try { ${preparar} } catch (e) {}
+
+    function proxima(i) {
+      if (i >= testes.length) {
+        parent.postMessage({ tipo: "educacode-checks", resultados: out }, "*");
+        return;
+      }
+      var t = testes[i];
+      var executa = function () {
+        try { out.push({ desc: t.desc, ok: !!(new Function(t.teste))() }); }
+        catch (e) { out.push({ desc: t.desc, ok: false, erro: String(e.message || e) }); }
+        proxima(i + 1);
+      };
+      if (t.esperar) setTimeout(executa, t.esperar);
+      else executa();
+    }
+    proxima(0);
   }
   // Deixa o CSS e o script do aluno terminarem antes de avaliar.
   if (document.readyState === "complete") setTimeout(rodar, 60);
@@ -175,16 +303,24 @@ ${scriptChecks}
   function marcarConcluidos() {
     Array.prototype.forEach.call(selectEl.options, function (op) {
       const d = window.DESAFIOS.find(function (x) { return x.id === op.value; });
-      if (!d || !d.checks.length) return;
+      if (!d) return;
+      const total = d.tipo === "logica" ? (d.casos || []).length : (d.checks || []).length;
+      if (!total) return;
+
       const salvo = window.Progresso && window.Progresso.obter("pratica", d.id);
       const feito = salvo && salvo.total > 0 && salvo.melhor === salvo.total;
-      op.textContent = (feito ? "✔ " : "") + d.nivel + " · " + d.titulo;
+      op.textContent = (feito ? "✔ " : "") + d.titulo;
     });
   }
 
   function renderTabs() {
     tabsEl.innerHTML = "";
-    LINGUAGENS.forEach(function (l) {
+    // Desafio de lógica é JS puro: HTML e CSS não entram.
+    const langs = desafio.tipo === "logica"
+      ? LINGUAGENS.filter(function (l) { return l.key === "js"; })
+      : LINGUAGENS;
+
+    langs.forEach(function (l) {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "code-tab" + (l.key === lang ? " active" : "");
@@ -233,14 +369,28 @@ ${scriptChecks}
     const rascunho = usarRascunho ? lerRascunhos()[desafio.id] : null;
     codigo = rascunho
       ? { html: rascunho.html || "", css: rascunho.css || "", js: rascunho.js || "" }
-      : { html: desafio.inicial.html, css: desafio.inicial.css, js: desafio.inicial.js };
+      : {
+          html: desafio.inicial.html || "",
+          css: desafio.inicial.css || "",
+          js: desafio.inicial.js || ""
+        };
 
-    lang = "html";
+    lang = desafio.tipo === "logica" ? "js" : "html";
     renderTabs();
     renderInfo();
     editor.value = codigo[lang];
 
-    checkBtn.style.display = desafio.checks.length ? "" : "none";
+    const temVerificacao = desafio.tipo === "logica"
+      ? (desafio.casos || []).length > 0
+      : (desafio.checks || []).length > 0;
+    checkBtn.style.display = temVerificacao ? "" : "none";
+
+    if (previewTitulo) {
+      previewTitulo.textContent = desafio.tipo === "logica" ? "Casos de teste" : "Resultado";
+    }
+    if (previewDica) {
+      previewDica.textContent = desafio.tipo === "logica" ? "roda a cada tecla" : "atualiza sozinho";
+    }
     resultEl.className = "check-result hidden";
     resultEl.innerHTML = "";
 
@@ -291,11 +441,22 @@ ${scriptChecks}
   });
 
   // ---------- inicialização ----------
+  // Agrupa por etapa do projeto, para o aluno achar o que precisa.
+  const grupos = {};
   window.DESAFIOS.forEach(function (d) {
-    const op = document.createElement("option");
-    op.value = d.id;
-    op.textContent = d.nivel + " · " + d.titulo;
-    selectEl.appendChild(op);
+    (grupos[d.nivel] = grupos[d.nivel] || []).push(d);
+  });
+
+  Object.keys(grupos).forEach(function (nivel) {
+    const grupo = document.createElement("optgroup");
+    grupo.label = nivel;
+    grupos[nivel].forEach(function (d) {
+      const op = document.createElement("option");
+      op.value = d.id;
+      op.textContent = d.titulo;
+      grupo.appendChild(op);
+    });
+    selectEl.appendChild(grupo);
   });
 
   const inicial = new URLSearchParams(location.search).get("desafio");
