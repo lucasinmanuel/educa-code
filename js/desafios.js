@@ -500,5 +500,325 @@ window.DESAFIOS = [
         teste: "var l=document.getElementById('lista'); return !!l && l.querySelectorAll('li').length===0"
       }
     ]
+  },
+
+  // ==================== ETAPA 1 — mais regras de negócio ====================
+
+  {
+    id: "gerar-slug",
+    titulo: "Gerar slug de URL",
+    nivel: "Etapa 1 · Lógica",
+    tipo: "logica",
+    funcao: "gerarSlug",
+    objetivo: 'Escreva gerarSlug(texto) que transforma "Camiseta Preta" em "camiseta-preta": sem acento, tudo minúsculo, e qualquer sequência de caractere estranho vira um hífen. Sem hífen sobrando nas pontas.',
+    dicas: [
+      'Tirar acento: texto.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "")',
+      'Trocar o que não for letra ou número: .replace(/[^a-z0-9]+/g, "-")',
+      'Limpar as pontas no fim: .replace(/^-+|-+$/g, "")'
+    ],
+    inicial: { js: "function gerarSlug(texto) {\n  // escreva aqui\n}" },
+    casos: [
+      { desc: "espaço vira hífen", chamada: 'gerarSlug("Camiseta Preta")', esperado: "camiseta-preta" },
+      { desc: "remove acentos", chamada: 'gerarSlug("Café com Leite")', esperado: "cafe-com-leite" },
+      { desc: "colapsa espaços repetidos", chamada: 'gerarSlug("  Espaços  Extras ")', esperado: "espacos-extras" },
+      { desc: "descarta pontuação", chamada: 'gerarSlug("Já!!! Foi?")', esperado: "ja-foi" },
+      { desc: "mantém números", chamada: 'gerarSlug("Notebook 15 polegadas")', esperado: "notebook-15-polegadas" }
+    ]
+  },
+
+  {
+    id: "buscar-termo",
+    titulo: "Busca por termo",
+    nivel: "Etapa 1 · Lógica",
+    tipo: "logica",
+    funcao: "buscarPorTermo",
+    objetivo: "Escreva buscarPorTermo(produtos, termo) que devolve só os produtos cujo nome contém o termo, ignorando maiúsculas. Termo vazio devolve a lista inteira. É a lógica da barra de busca da Etapa 3.",
+    dicas: [
+      "filter() devolve um array novo, sem mexer no original",
+      "Compare tudo em minúsculo: nome.toLowerCase().includes(termo.toLowerCase())",
+      "Trate o termo vazio logo no começo"
+    ],
+    inicial: { js: "function buscarPorTermo(produtos, termo) {\n  // escreva aqui\n}" },
+    casos: [
+      { desc: "acha pelo começo do nome", chamada: 'buscarPorTermo([{ nome: "Teclado" }, { nome: "Mouse" }], "tec")', esperado: [{ nome: "Teclado" }] },
+      { desc: "ignora maiúsculas", chamada: 'buscarPorTermo([{ nome: "Teclado" }, { nome: "Mouse" }], "MOUSE")', esperado: [{ nome: "Mouse" }] },
+      { desc: "acha no meio do nome", chamada: 'buscarPorTermo([{ nome: "Cabo HDMI" }, { nome: "Monitor" }], "hdmi")', esperado: [{ nome: "Cabo HDMI" }] },
+      { desc: "termo vazio devolve tudo", chamada: 'buscarPorTermo([{ nome: "Teclado" }, { nome: "Mouse" }], "")', esperado: [{ nome: "Teclado" }, { nome: "Mouse" }] },
+      { desc: "sem resultado devolve lista vazia", chamada: 'buscarPorTermo([{ nome: "Teclado" }], "geladeira")', esperado: [] }
+    ]
+  },
+
+  {
+    id: "paginar",
+    titulo: "Paginar resultados",
+    nivel: "Etapa 1 · Lógica",
+    tipo: "logica",
+    funcao: "paginar",
+    objetivo: "Escreva paginar(itens, pagina, porPagina) que devolve só a fatia daquela página. A primeira página é a 1 (não a 0). Página que não existe devolve lista vazia.",
+    dicas: [
+      "slice(inicio, fim) recorta sem alterar o array original",
+      "Como a página começa em 1, o início é (pagina - 1) * porPagina",
+      "slice já devolve [] sozinho quando o início passa do fim"
+    ],
+    inicial: { js: "function paginar(itens, pagina, porPagina) {\n  // escreva aqui\n}" },
+    casos: [
+      { desc: "primeira página", chamada: "paginar([1, 2, 3, 4, 5], 1, 2)", esperado: [1, 2] },
+      { desc: "página do meio", chamada: "paginar([1, 2, 3, 4, 5], 2, 2)", esperado: [3, 4] },
+      { desc: "última página incompleta", chamada: "paginar([1, 2, 3, 4, 5], 3, 2)", esperado: [5] },
+      { desc: "página que não existe", chamada: "paginar([1, 2, 3], 9, 2)", esperado: [] },
+      { desc: "lista vazia", chamada: "paginar([], 1, 10)", esperado: [] }
+    ]
+  },
+
+  {
+    id: "ordenar-por",
+    titulo: "Ordenar sem estragar o original",
+    nivel: "Etapa 1 · Lógica",
+    tipo: "logica",
+    funcao: "ordenarPor",
+    objetivo: "Escreva ordenarPor(lista, campo) que devolve uma NOVA lista ordenada pelo campo numérico, em ordem crescente. A lista original não pode ser alterada.",
+    dicas: [
+      "sort() altera o array original — essa é a pegadinha do exercício",
+      "Copie antes: [...lista].sort(...) ou lista.slice().sort(...)",
+      "Para números, o comparador é (a, b) => a[campo] - b[campo]"
+    ],
+    inicial: { js: "function ordenarPor(lista, campo) {\n  // escreva aqui\n}" },
+    casos: [
+      { desc: "ordena por preço", chamada: 'ordenarPor([{ preco: 30 }, { preco: 10 }, { preco: 20 }], "preco")', esperado: [{ preco: 10 }, { preco: 20 }, { preco: 30 }] },
+      { desc: "já ordenada continua igual", chamada: 'ordenarPor([{ preco: 1 }, { preco: 2 }], "preco")', esperado: [{ preco: 1 }, { preco: 2 }] },
+      { desc: "NÃO altera a lista original", chamada: '(function () { var a = [{ preco: 30 }, { preco: 10 }]; ordenarPor(a, "preco"); return a[0].preco; })()', esperado: 30 },
+      { desc: "funciona com outro campo", chamada: 'ordenarPor([{ qtd: 5 }, { qtd: 1 }], "qtd")', esperado: [{ qtd: 1 }, { qtd: 5 }] },
+      { desc: "lista vazia", chamada: 'ordenarPor([], "preco")', esperado: [] }
+    ]
+  },
+
+  {
+    id: "agrupar-por",
+    titulo: "Agrupar por categoria",
+    nivel: "Etapa 1 · Lógica",
+    tipo: "logica",
+    funcao: "agruparPor",
+    objetivo: 'Escreva agruparPor(lista, campo) que devolve um objeto onde cada chave é um valor do campo e o valor é o array dos itens daquele grupo.',
+    dicas: [
+      "reduce() com um objeto {} como valor inicial",
+      "Se a chave ainda não existe, crie com um array vazio antes de empurrar o item",
+      "acc[chave] = acc[chave] || []; acc[chave].push(item);"
+    ],
+    inicial: { js: "function agruparPor(lista, campo) {\n  // escreva aqui\n}" },
+    casos: [
+      {
+        desc: "agrupa em duas categorias",
+        chamada: 'agruparPor([{ tipo: "fruta", n: "uva" }, { tipo: "doce", n: "bolo" }, { tipo: "fruta", n: "pera" }], "tipo")',
+        esperado: { fruta: [{ tipo: "fruta", n: "uva" }, { tipo: "fruta", n: "pera" }], doce: [{ tipo: "doce", n: "bolo" }] }
+      },
+      {
+        desc: "um grupo só",
+        chamada: 'agruparPor([{ uf: "SP" }, { uf: "SP" }], "uf")',
+        esperado: { SP: [{ uf: "SP" }, { uf: "SP" }] }
+      },
+      { desc: "lista vazia devolve objeto vazio", chamada: 'agruparPor([], "tipo")', esperado: {} }
+    ]
+  },
+
+  // ==================== ETAPA 2 — mais HTML e CSS ====================
+
+  {
+    id: "tabela-semantica",
+    titulo: "Tabela com cabeçalho",
+    nivel: "Etapa 2 · HTML",
+    objetivo: "Monte uma tabela com <thead> (uma linha de <th>: Produto e Preço) e <tbody> com 2 linhas de <td>.",
+    dicas: [
+      "<th> é célula de cabeçalho; <td> é célula de dado",
+      "Separar thead e tbody ajuda leitor de tela e permite rolar só o corpo",
+      "Cada linha fica dentro de um <tr>"
+    ],
+    inicial: { html: "<table>\n  <!-- escreva aqui -->\n</table>", css: "", js: "" },
+    checks: [
+      { desc: "A tabela tem <thead> e <tbody>", teste: "return !!document.querySelector('table thead') && !!document.querySelector('table tbody')" },
+      { desc: "O cabeçalho tem 2 <th>", teste: "return document.querySelectorAll('thead th').length===2" },
+      { desc: "O corpo tem 2 linhas", teste: "return document.querySelectorAll('tbody tr').length===2" },
+      { desc: "As linhas usam <td>, não <th>", teste: "return document.querySelectorAll('tbody td').length>=4 && document.querySelectorAll('tbody th').length===0" }
+    ]
+  },
+
+  {
+    id: "imagem-acessivel",
+    titulo: "Imagem com legenda",
+    nivel: "Etapa 2 · HTML",
+    objetivo: "Coloque a imagem dentro de um <figure>, com texto alternativo no alt e uma <figcaption> descrevendo a foto.",
+    dicas: [
+      "O alt é lido por quem não enxerga a imagem; a figcaption aparece na tela para todos",
+      "A <figcaption> vai dentro do <figure>, junto da <img>",
+      "Um alt vazio só se justifica em imagem puramente decorativa"
+    ],
+    inicial: {
+      html: '<!-- use esta imagem -->\n<!-- <img src="https://via.placeholder.com/200x120"> -->',
+      css: "body { font-family: sans-serif; padding: 20px; }\nfigcaption { color: #5f6368; font-size: 14px; }",
+      js: ""
+    },
+    checks: [
+      { desc: "Existe um <figure>", teste: "return !!document.querySelector('figure')" },
+      { desc: "A <img> está dentro do figure", teste: "return !!document.querySelector('figure img')" },
+      { desc: "A imagem tem alt preenchido", teste: "var i=document.querySelector('figure img'); return !!i && i.getAttribute('alt') && i.getAttribute('alt').trim().length>3" },
+      { desc: "Existe uma <figcaption> com texto", teste: "var f=document.querySelector('figure figcaption'); return !!f && f.textContent.trim().length>0" }
+    ]
+  },
+
+  {
+    id: "header-flex",
+    titulo: "Cabeçalho com Flexbox",
+    nivel: "Etapa 2 · CSS",
+    objetivo: "Deixe o header com a logo na esquerda e o menu na direita, alinhados verticalmente no centro.",
+    dicas: [
+      "display: flex coloca os filhos lado a lado",
+      "justify-content: space-between joga um para cada ponta",
+      "align-items: center alinha na vertical"
+    ],
+    inicial: {
+      html: '<header>\n  <span class="logo">Minha Loja</span>\n  <nav><a href="#">Início</a> <a href="#">Produtos</a></nav>\n</header>',
+      css: "body { margin: 0; font-family: sans-serif; }\n\nheader {\n  background: #ede7f6;\n  padding: 16px 24px;\n  /* escreva aqui */\n}",
+      js: ""
+    },
+    checks: [
+      { desc: "O header usa display: flex", teste: "var h=document.querySelector('header'); return !!h && getComputedStyle(h).display==='flex'" },
+      { desc: "Logo e menu vão para as pontas", teste: "var h=document.querySelector('header'); return !!h && getComputedStyle(h).justifyContent==='space-between'" },
+      { desc: "Alinhados no centro na vertical", teste: "var h=document.querySelector('header'); return !!h && getComputedStyle(h).alignItems==='center'" }
+    ]
+  },
+
+  {
+    id: "foco-visivel",
+    titulo: "Foco visível no teclado",
+    nivel: "Etapa 2 · CSS",
+    objetivo: "Dê ao .botao um contorno visível quando ele recebe foco pelo teclado, usando :focus-visible. Sem isso, quem navega por Tab não enxerga onde está.",
+    dicas: [
+      ":focus-visible aplica só na navegação por teclado, não no clique do mouse",
+      "Use outline com no mínimo 2px, e outline-offset para dar respiro",
+      "Nunca deixe outline: none sem colocar outro indicador no lugar"
+    ],
+    inicial: {
+      html: '<button class="botao">Enviar</button>\n<p>Aperte Tab para testar.</p>',
+      css: "body { font-family: sans-serif; padding: 20px; }\n\n.botao {\n  background: #673ab7;\n  color: white;\n  border: none;\n  padding: 12px 24px;\n  border-radius: 8px;\n}\n\n/* escreva aqui */",
+      js: ""
+    },
+    checks: [
+      {
+        desc: "Existe uma regra com :focus-visible",
+        teste: "var t=''; for(var i=0;i<document.styleSheets.length;i++){try{var r=document.styleSheets[i].cssRules;for(var j=0;j<r.length;j++)t+=r[j].cssText;}catch(e){}} return /focus-visible/.test(t)"
+      },
+      {
+        desc: "Ela define um outline visível",
+        teste: "var t=''; for(var i=0;i<document.styleSheets.length;i++){try{var r=document.styleSheets[i].cssRules;for(var j=0;j<r.length;j++){if(/focus-visible/.test(r[j].cssText)) t+=r[j].cssText;}}catch(e){}} return /outline/.test(t) && !/outline:\\s*none/.test(t)"
+      }
+    ]
+  },
+
+  // ==================== ETAPA 2 — mais DOM ====================
+
+  {
+    id: "modal",
+    titulo: "Abrir e fechar modal",
+    nivel: "Etapa 2 · DOM",
+    objetivo: 'O #modal começa com a classe "escondido". Ao clicar em #abrir, remova a classe; ao clicar em #fechar, coloque de volta.',
+    dicas: [
+      "classList.remove('escondido') e classList.add('escondido')",
+      "Um modal de verdade também fecha com a tecla Esc — tente depois",
+      "Nada de bibliotecas: a Etapa 2 pede JavaScript puro"
+    ],
+    inicial: {
+      html: '<button id="abrir">Abrir</button>\n\n<div id="modal" class="escondido">\n  <p>Salvo com sucesso!</p>\n  <button id="fechar">Fechar</button>\n</div>',
+      css: "body { font-family: sans-serif; padding: 20px; }\n#modal { background: #e6f4ea; padding: 20px; border-radius: 8px; margin-top: 16px; }\n.escondido { display: none; }",
+      js: "// escreva aqui"
+    },
+    checks: [
+      { desc: "Começa escondido", teste: "var m=document.getElementById('modal'); return !!m && m.classList.contains('escondido')" },
+      { desc: "Abre ao clicar em Abrir", teste: "var a=document.getElementById('abrir'),m=document.getElementById('modal'); if(!a||!m) return false; a.click(); return !m.classList.contains('escondido')" },
+      { desc: "Fecha ao clicar em Fechar", teste: "var f=document.getElementById('fechar'),m=document.getElementById('modal'); if(!f||!m) return false; f.click(); return m.classList.contains('escondido')" }
+    ]
+  },
+
+  {
+    id: "busca-ao-vivo",
+    titulo: "Filtrar lista enquanto digita",
+    nivel: "Etapa 2 · DOM",
+    objetivo: "Ao digitar no #busca, esconda os <li> que não contêm o texto digitado (ignorando maiúsculas). Campo vazio mostra todos de novo.",
+    dicas: [
+      "Escute o evento 'input', que dispara a cada tecla",
+      "Compare tudo em minúsculo com toLowerCase()",
+      "Para esconder: item.style.display = 'none'; para mostrar: ''"
+    ],
+    inicial: {
+      html: '<input id="busca" placeholder="Filtrar...">\n<ul id="lista">\n  <li>Teclado</li>\n  <li>Mouse</li>\n  <li>Monitor</li>\n</ul>',
+      css: "body { font-family: sans-serif; padding: 20px; }\ninput { padding: 8px; width: 200px; }",
+      js: "// escreva aqui"
+    },
+    checks: [
+      {
+        desc: 'Digitar "mo" deixa 2 itens visíveis',
+        teste: "var b=document.getElementById('busca'); if(!b) return false; b.value='mo'; b.dispatchEvent(new Event('input',{bubbles:true})); var v=[].filter.call(document.querySelectorAll('#lista li'),function(x){return getComputedStyle(x).display!=='none';}); return v.length===2"
+      },
+      {
+        desc: 'Digitar "teclado" deixa só 1',
+        teste: "var b=document.getElementById('busca'); if(!b) return false; b.value='teclado'; b.dispatchEvent(new Event('input',{bubbles:true})); var v=[].filter.call(document.querySelectorAll('#lista li'),function(x){return getComputedStyle(x).display!=='none';}); return v.length===1"
+      },
+      {
+        desc: "Apagar tudo mostra os 3 de novo",
+        teste: "var b=document.getElementById('busca'); if(!b) return false; b.value=''; b.dispatchEvent(new Event('input',{bubbles:true})); var v=[].filter.call(document.querySelectorAll('#lista li'),function(x){return getComputedStyle(x).display!=='none';}); return v.length===3"
+      }
+    ]
+  },
+
+  // ==================== ETAPA 3 — mais async ====================
+
+  {
+    id: "async-vazio",
+    titulo: "Estado vazio",
+    nivel: "Etapa 3 · Async",
+    objetivo: 'A API responde com uma lista vazia. Em vez de deixar a tela em branco, mostre "Nenhum produto encontrado" no #status.',
+    dicas: [
+      "Depois do await, confira o length antes de renderizar",
+      "Tela vazia sem explicação faz o usuário achar que quebrou",
+      "É o mesmo cuidado que o @if do Angular resolve na Etapa 3"
+    ],
+    inicial: {
+      html: '<button id="btn">Carregar</button>\n<p id="status"></p>\n<ul id="lista"></ul>',
+      css: "body { font-family: sans-serif; padding: 20px; }\n#status { color: #5f6368; }",
+      js: "// A API responde certo, mas sem nenhum produto\nfunction buscarProdutos() {\n  return new Promise(function (resolve) {\n    setTimeout(function () { resolve([]); }, 300);\n  });\n}\n\n// escreva aqui"
+    },
+    preparar: "var b=document.getElementById('btn'); if (b) b.click();",
+    checks: [
+      { esperar: 800, desc: "Mostra a mensagem de lista vazia", teste: "var s=document.getElementById('status'); return !!s && s.textContent.trim()==='Nenhum produto encontrado'" },
+      { desc: "Não cria nenhum <li>", teste: "var l=document.getElementById('lista'); return !!l && l.querySelectorAll('li').length===0" }
+    ]
+  },
+
+  {
+    id: "async-busca",
+    titulo: "Buscar na API por termo",
+    nivel: "Etapa 3 · Async",
+    objetivo: 'Ao clicar em #btn, chame buscarProdutos(termo) com o valor do #busca e liste os nomes em <li>. É a jornada que o teste E2E do Playwright vai percorrer na Etapa 3.',
+    dicas: [
+      "Leia o valor do campo antes de chamar a função",
+      "buscarProdutos(termo) devolve uma Promise já filtrada",
+      "Limpe a lista antes de renderizar, senão os resultados se acumulam"
+    ],
+    inicial: {
+      html: '<input id="busca" placeholder="Buscar produto">\n<button id="btn">Buscar</button>\n<ul id="lista"></ul>',
+      css: "body { font-family: sans-serif; padding: 20px; }\ninput { padding: 8px; }",
+      js: "// Simula GET /produtos?q=termo\nfunction buscarProdutos(termo) {\n  var todos = [{ nome: \"Teclado\" }, { nome: \"Mouse\" }, { nome: \"Monitor\" }];\n  return new Promise(function (resolve) {\n    setTimeout(function () {\n      resolve(todos.filter(function (p) {\n        return p.nome.toLowerCase().indexOf(String(termo).toLowerCase()) !== -1;\n      }));\n    }, 300);\n  });\n}\n\n// escreva aqui"
+    },
+    preparar: "var i=document.getElementById('busca'); if (i) i.value='mo'; var b=document.getElementById('btn'); if (b) b.click();",
+    checks: [
+      { esperar: 800, desc: 'Buscar "mo" traz 2 resultados', teste: "var l=document.getElementById('lista'); return !!l && l.querySelectorAll('li').length===2" },
+      { desc: "Os nomes aparecem na tela", teste: "var t=document.getElementById('lista').textContent; return /mouse/i.test(t) && /monitor/i.test(t)" },
+      {
+        // `antes` dispara a segunda busca; a espera deixa a Promise resolver
+        // antes de conferir. Se a lista não for limpa, sobram 3 itens.
+        antes: "var i=document.getElementById('busca'),b=document.getElementById('btn'); if(i&&b){ i.value='teclado'; b.click(); }",
+        esperar: 800,
+        desc: "Nova busca substitui a anterior, não acumula",
+        teste: "var l=document.getElementById('lista'); return l.querySelectorAll('li').length===1"
+      }
+    ]
   }
 ];

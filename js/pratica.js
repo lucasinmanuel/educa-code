@@ -189,6 +189,9 @@ ${escaparFechamento(codigo.js, "script")}
         return;
       }
       var t = testes[i];
+      // "antes" prepara o cenario (um clique, por exemplo) e so depois espera.
+      if (t.antes) { try { (new Function(t.antes))(); } catch (e) {} }
+
       var executa = function () {
         try { out.push({ desc: t.desc, ok: !!(new Function(t.teste))() }); }
         catch (e) { out.push({ desc: t.desc, ok: false, erro: String(e.message || e) }); }
